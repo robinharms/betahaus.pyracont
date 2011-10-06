@@ -16,8 +16,8 @@ from pyramid.security import authenticated_userid
 from betahaus.pyracont.interfaces import IBaseFolder
 from betahaus.pyracont.interfaces import IVersioningField
 from betahaus.pyracont.events import ObjectUpdatedEvent
-from betahaus.pyracont.decorators import content_factory
 from betahaus.pyracont.factories import createContent
+from zope.component.interfaces import ComponentLookupError
 
 
 class BaseFolder(Folder):
@@ -139,7 +139,11 @@ class BaseFolder(Folder):
         if key not in self.versioning_fields:
             raise KeyError("There's no versioning field called '%s'" % key)
         if key not in self._field_storage:
-            self._field_storage[key] = createContent('VersioningField')
+            try:
+                field = createContent('VersioningField')
+            except ComponentLookupError:
+                field = VersioningField()
+            self._field_storage[key] = field
         return self._field_storage[key]
 
     def _get_versioning_field_value(self, key, default=None):
@@ -154,7 +158,6 @@ class BaseFolder(Folder):
         field.add(value)
 
 
-@content_factory('VersioningField')
 class VersioningField(Persistent):
     """ Field that has versioning rather than just storing one value. """
     implements(IVersioningField)

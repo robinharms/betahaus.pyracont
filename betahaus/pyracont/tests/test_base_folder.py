@@ -30,13 +30,6 @@ class BaseFolderTests(TestCase):
         from betahaus.pyracont import utcnow
         return utcnow()
 
-    def _register_versioning_field(self):
-        from betahaus.pyracont import VersioningField
-        from betahaus.pyracont.interfaces import IContentFactory
-        factory = Factory(VersioningField,
-                          'VersioningField',)
-        self.config.registry.registerUtility(factory, IContentFactory, 'VersioningField')
-
     def test_verify_class(self):
         from betahaus.pyracont.interfaces import IBaseFolder
         self.failUnless(verifyClass(IBaseFolder, self._cut))
@@ -127,7 +120,6 @@ class BaseFolderTests(TestCase):
         self.assertEqual(obj.get_field_value('title'), "I'm very custom")
 
     def test_get_and_set_field_value_versioning_field(self):
-        self._register_versioning_field()
         class _CustomCls(self._cut):
             versioning_fields = ('test',)
 
@@ -141,7 +133,6 @@ class BaseFolderTests(TestCase):
         self.assertEqual(revisions[2]['value'], 'World')        
 
     def test_get_field_value_versioning_empty(self):
-        self._register_versioning_field()
         class _CustomCls(self._cut):
             versioning_fields = ('test',)
         
@@ -208,7 +199,6 @@ class BaseFolderTests(TestCase):
 
     def test_get_versioning_field(self):
         from betahaus.pyracont import VersioningField
-        self._register_versioning_field()
 
         class _CustomCls(self._cut):
             versioning_fields = ('test',)
