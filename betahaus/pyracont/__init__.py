@@ -14,6 +14,7 @@ from pyramid.threadlocal import get_current_request
 from pyramid.security import authenticated_userid
 
 from betahaus.pyracont.interfaces import IBaseFolder
+from betahaus.pyracont.interfaces import IVersioningField
 from betahaus.pyracont.events import ObjectUpdatedEvent
 from betahaus.pyracont.decorators import content_factory
 from betahaus.pyracont.factories import createContent
@@ -153,6 +154,7 @@ class BaseFolder(Folder):
 @content_factory('VersioningField')
 class VersioningField(Persistent):
     """ Field that has versioning rather than just storing one value. """
+    implements(IVersioningField)
 
     def __init__(self):
         self.__revision_values__ = LOBTree()
@@ -171,7 +173,7 @@ class VersioningField(Persistent):
     def _revision_created_timestamps(self):
         return self.__revision_created_timestamps__
 
-    def get_current_rev(self):
+    def get_current_rev_id(self):
         if len(self._revision_values) == 0:
             return 0
         return self._revision_values.maxKey()
@@ -184,7 +186,7 @@ class VersioningField(Persistent):
             request = get_current_request()
             author = authenticated_userid(request)
         #author might still be None, if this is run by a script or by an unauthenticated user
-        id = self.get_current_rev()+1
+        id = self.get_current_rev_id()+1
         self._revision_values[id] = value
         self._revision_authors[id] = author
         self._revision_created_timestamps[id] = created
@@ -197,18 +199,21 @@ class VersioningField(Persistent):
     def get_last_revision(self, default=None):
         if not len(self._revision_values):
             return default
-        id = self.get_current_rev()
+        id = self.get_current_rev_id()
+        return self.get_revision(id)
+
+    def get_last_revision_value(self, default=None):
+        if not len(self._revision_values):
+            return default
+        id = self.get_current_rev_id()
+        return self._revision_values[id]
+
+    def get_revision(self, id):
         result = {}
         result['value'] = self._revision_values[id]
         result['author'] = self._revision_authors[id]
         result['created'] = self._revision_created_timestamps[id]
         return result
-
-    def get_last_revision_value(self, default=None):
-        if not len(self._revision_values):
-            return default
-        id = self.get_current_rev()
-        return self._revision_values[id]
 
     def get_revisions(self):
         results = {}

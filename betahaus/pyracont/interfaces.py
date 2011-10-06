@@ -101,3 +101,43 @@ class IBaseFolder(Interface):
             Will only work if key is specified in versioning_fields attribute.
         """
 
+
+class IVersioningField(Interface):
+    """ Versioning fields store a value like any other, but they also keep the
+        old values and keep track of author and when each revision was added.
+    """
+
+    def get_current_rev_id():
+        """ Return current revision id, always an integer.
+            0 if no revisions exist.
+        """
+
+    def add(value, author=None, created=None):
+        """ Add a new revision.
+            author: Author of this revision. If it's None, the field will try to extract it from the current request.
+            created: TZ-aware datetime of when it was created. Will set now in UTC timezone if it's None.
+        """
+
+    def remove(id):
+        """ Remove a revision completely. Normally a bad idea to use,
+            since it goes against the purpouse of versioning.
+        """
+
+    def get_last_revision(default=None):
+        """ Return last revision, or default if no revision exist.
+            Will get full revision info with a dict containing author, value and created.
+        """
+
+    def get_last_revision_value(default=None):
+        """ Only return value from last revision, or default if no revision exist.
+        """
+
+    def get_revision(id):
+        """ Get a specific revision.
+        """
+
+    def get_revisions():
+        """ Return a dict of all revisions with revision number as key, and value will be each revisions info.
+            Example: {1:{'value':'Hello', 'author':'some_userid', 'created':'<datetime>'}, 2:{<etc...>}}
+        """
+        
