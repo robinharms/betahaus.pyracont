@@ -17,8 +17,8 @@ def createSchema(factory_name, context, request, **kwargs):
         different than the standard one.
         See the colander documentation for information on schema bind.
     """
+    #Note: bind() returns a bound schema, so it's not done in place .)
     schema = getUtility(ISchemaFactory, factory_name)()
-    schema.bind(context=context,
+    return schema.bind(context=context,
                 request=request,
                 **kwargs)
-    return schema
