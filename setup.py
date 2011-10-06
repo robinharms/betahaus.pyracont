@@ -9,10 +9,9 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 requires = ('pyramid',
             'repoze.folder',
             'slugify',
-            #'venusian',
             'pytz',
             'ZODB3',
-            'colander'
+            'colander',
             )
 
 setup(name='betahaus.pyracont',
