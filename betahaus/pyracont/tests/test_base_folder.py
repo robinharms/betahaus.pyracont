@@ -85,6 +85,15 @@ class BaseFolderTests(TestCase):
         obj = self._cut(title="a")
         self.assertEqual(obj.suggest_name(parent), 'a-3')
 
+    def test_suggest_name_full_namespace(self):
+        parent = {}
+        parent['a'] = object()
+        for i in range(101):
+            k = "a-%s" % i
+            parent[k] = object()
+        obj = self._cut(title='a')
+        self.assertRaises(KeyError, obj.suggest_name, parent)
+
     def test_mark_modified(self):
         obj = self._cut()
         modified = obj.modified
@@ -117,10 +126,20 @@ class BaseFolderTests(TestCase):
         obj = _CustomCls()
         obj.set_field_value('test', 'Hello')
         obj.set_field_value('test', 'World')
+        self.assertEqual(obj.get_field_value('test'), 'World')
         field = obj.get_versioning_field('test')
         revisions = field.get_revisions()
         self.assertEqual(revisions[1]['value'], 'Hello')        
         self.assertEqual(revisions[2]['value'], 'World')        
+
+    def test_get_field_value_versioning_empty(self):
+        self.config.scan('betahaus.pyracont')
+        class _CustomCls(self._cut):
+            versioning_fields = ('test',)
+        
+        obj = _CustomCls()
+        marker = object()
+        self.assertEqual(obj.get_field_value('test', marker), marker)
 
     def test_set_field_value_normal_field(self):
         obj = self._cut()
@@ -193,144 +212,4 @@ class BaseFolderTests(TestCase):
     def test_get_versioning_field_nonexistent_field(self):
         obj = self._cut()
         self.assertRaises(KeyError, obj.get_versioning_field, "i_dont_exist")
-
-
-class VersioningFieldTests(TestCase):
-    def setUp(self):
-        self.config = testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    @property
-    def _cut(self):
-        from betahaus.pyracont import VersioningField
-        return VersioningField
-
-    def _now(self):
-        from betahaus.pyracont import utcnow
-        return utcnow()
-
-    def test_verify_class(self):
-        from betahaus.pyracont.interfaces import IVersioningField
-        self.failUnless(verifyClass(IVersioningField, self._cut))
-
-    def test_verify_obj(self):
-        from betahaus.pyracont.interfaces import IVersioningField
-        self.failUnless(verifyObject(IVersioningField, self._cut()))
-
-    def test_get_current_rev_id(self):
-        obj = self._cut()
-        self.assertEqual(obj.get_current_rev_id(), 0)
-        obj.add('Hello')
-        self.assertEqual(obj.get_current_rev_id(), 1)
-
-    def test_add(self):
-        obj = self._cut()
-        now = self._now()
-        obj.add('Hello', author='some_user', created=now)
-        self.assertEqual(obj._revision_values[1], 'Hello')
-        self.assertEqual(obj._revision_authors[1], 'some_user')
-        self.assertEqual(obj._revision_created_timestamps[1], now)
-
-    def test_add_lookup_userid(self):
-        self.config.testing_securitypolicy(userid='tester')
-        obj = self._cut()
-        obj.add('Something')
-        rev = obj.get_last_revision()
-        self.assertEqual(rev['author'], 'tester')
-
-    def test_remove(self):
-        obj = self._cut()
-        obj.add('Hello')
-        obj.add('World')
-        obj.add('!')
-        self.assertEqual(len(obj), 3)
-        obj.remove(2)
-        self.assertEqual(len(obj), 2)
-
-    def test_get_last_revision(self):
-        now = self._now()
-        obj = self._cut()
-        obj.add('Hello')
-        obj.add('World')
-        obj.add('!', author='hi', created=now)
-        res = obj.get_last_revision()
-        self.assertEqual(res, {'value':'!', 'author': 'hi', 'created': now})
-
-    def test_get_last_revision_no_existing_revisions(self):
-        obj = self._cut()
-        marker = object()
-        res = obj.get_last_revision(marker)
-        self.assertEqual(res, marker)
-
-
-    def test_get_last_revision_value(self):
-        now = self._now()
-        obj = self._cut()
-        obj.add('Hello')
-        obj.add('World')
-        obj.add('!', author='hi', created=now)
-        self.assertEqual(obj.get_last_revision_value(), '!')
-
-
-    def test_get_revision(self):
-        now = self._now()
-        obj = self._cut()
-        obj.add('Hello', author='one', created=now)
-        obj.add('World', author='two', created=now)
-        obj.add('!', author='three', created=now)
-        res1 = obj.get_revision(1)
-        self.assertEqual(res1, {'value':'Hello', 'author': 'one', 'created': now})
-        res2 = obj.get_revision(2)
-        self.assertEqual(res2, {'value':'World', 'author': 'two', 'created': now})
-
-    def test_get_revision_nonexistent_key(self):
-        obj = self._cut()
-        self.assertRaises(KeyError, obj.get_revision, 1)
-
-    def test_get_revisions(self):
-        now = self._now()
-        obj = self._cut()
-        obj.add('Hello', author='one', created=now)
-        obj.add('World', author='two', created=now)
-        obj.add('!', author='three', created=now)
-        res = obj.get_revisions()
-        expected = {}
-        expected[1] = {'value':'Hello', 'author': 'one', 'created': now}
-        expected[2] = {'value':'World', 'author': 'two', 'created': now}
-        expected[3] = {'value':'!', 'author': 'three', 'created': now}
-        self.assertEqual(res, expected)
-
-
-class DecoratorsTests(TestCase):
-    #FIXME
-    pass
-
-
-class EventsTests(TestCase):
-    def setUp(self):
-        self.config = testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    @property
-    def _cut(self):
-        from betahaus.pyracont.events import ObjectUpdatedEvent
-        return ObjectUpdatedEvent
-
-    def test_verify_class(self):
-        from betahaus.pyracont.interfaces import IObjectUpdatedEvent
-        self.failUnless(verifyClass(IObjectUpdatedEvent, self._cut))
-
-    def test_verify_obj(self):
-        from betahaus.pyracont.interfaces import IObjectUpdatedEvent
-        self.failUnless(verifyObject(IObjectUpdatedEvent, self._cut(object())))
-
-
-class FactoriesTests(TestCase):
-    #FIXME
-    pass
-
 

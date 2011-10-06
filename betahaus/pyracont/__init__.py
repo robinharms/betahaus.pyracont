@@ -65,7 +65,10 @@ class BaseFolder(Folder):
     def suggest_name(self, parent):
         """ Suggest a name if this content would be added to parent.
         """
-        return generate_slug(parent, self.title)
+        title = self.title
+        if not title:
+            raise ValueError("Title can't be empty to use suggest_name")
+        return generate_slug(parent, title)
 
     def mark_modified(self):
         """ Mark content as modified. """

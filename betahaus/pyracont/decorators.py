@@ -10,14 +10,15 @@ class content_factory(object):
     """ Decorator for factories for regular content types """
     venusian = venusian
     
-    def __init__(self, factory_name, description=u'', interfaces=None):
+    def __init__(self, factory_name, title=u'', description=u'', interfaces=None):
         self.factory_name = factory_name
+        self.title = title
         self.description = description
         self.interfaces = interfaces
 
     def register(self, scanner, name, wrapped):
         factory = Factory(wrapped,
-                          title=self.factory_name,
+                          title=self.title,
                           description=self.description,
                           interfaces=self.interfaces)
         scanner.config.registry.registerUtility(factory, IContentFactory, self.factory_name)
@@ -31,7 +32,7 @@ class schema_factory(content_factory):
     """ Decorator for factories that create colander schemas. """
     def register(self, scanner, name, wrapped):
         factory = Factory(wrapped,
-                          title=self.factory_name,
+                          title=self.title,
                           description=self.description,
                           interfaces=self.interfaces)
         scanner.config.registry.registerUtility(factory, ISchemaFactory, self.factory_name)
