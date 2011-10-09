@@ -68,4 +68,35 @@ class CreateSchemaTests(TestCase):
         #Note: Instantiated schemas are SchemaNodes themselves!
         self.failUnless(isinstance(obj, colander.SchemaNode))
 
-    
+
+class CreateFieldTests(TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+        self._register_factory()
+        
+    def tearDown(self):
+        testing.tearDown()
+
+    @property
+    def _field_cls(self):
+        from betahaus.pyracont.fields.base import BaseField
+        return BaseField
+
+    def _register_factory(self):
+        from betahaus.pyracont.interfaces import IFieldFactory
+        factory = Factory(self._field_cls, 'BaseField')
+        self.config.registry.registerUtility(factory, IFieldFactory, 'BaseField')
+
+    @property
+    def _fut(self):
+        from betahaus.pyracont.factories import createField
+        return createField
+
+    def test_create_object(self):
+        """ Should return the same as createField. """
+        obj = createObject('BaseField')
+        self.failUnless(isinstance(obj, self._field_cls))
+
+    def test_create_field(self):
+        obj = self._fut('BaseField')
+        self.failUnless(isinstance(obj, self._field_cls))

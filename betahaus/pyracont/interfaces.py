@@ -8,7 +8,13 @@ class IContentFactory(IFactory):
     
 
 class ISchemaFactory(IFactory):
-    """ Factory for colander.Schema objects. Works the same way as IFactory """
+    """ Factory for colander.Schema objects. Requires context and request to work.
+        Will return a bound schema instance.
+    """
+
+
+class IFieldFactory(IFactory):
+    """ Factory for fields. Works the same way as IFactory. """
 
 
 class IObjectUpdatedEvent(Interface):
@@ -49,8 +55,10 @@ class IBaseFolder(Interface):
         """ Same as custon accessor, but the callable must accept a value.
             The mutator method must accept value as argument.
             Method must also accept key as kwarg.""")
-    versioning_fields = Attribute(
-        " A list of fields where they should employ versioning rather than just storing a value.")
+    custom_fields = Attribute(
+        """ A dict of fields consisting of key (field name) and field factory name.
+            A field type must be registered with that factory name.
+            Example: {'wiki_text':'VersioningField'} if your register a field factory with the name 'VersioningField'.""")
 
     def __init__(data=None, **kwargs):
         """ Init class. Any kwargs passed will be stored in this content. """
@@ -96,13 +104,29 @@ class IBaseFolder(Interface):
             mark_modified: mark content as updated if anything was changed.
         """
 
-    def get_versioning_field(key):
-        """ Return versioning field. Create it if it doesn't exist.
-            Will only work if key is specified in versioning_fields attribute.
+    def get_custom_field(key):
+        """ Return custom field. Create it if it doesn't exist.
+            Will only work if key:field_type is specified in custom_fields attribute.
         """
 
 
-class IVersioningField(Interface):
+class IBaseField(Interface):
+    """ """
+    key = Attribute("Store which key this field will be accessed by. For convenience.")
+    
+    def __init__(key=None, **kwargs):
+        """ Initialize field. key is the key of the field,
+            same as the value that will be passed to get_field_value method.
+        """
+
+    def get(default=None):
+        """ Get field value """
+    
+    def set(value):
+        """ Set field value """
+
+
+class IVersioningField(IBaseField):
     """ Versioning fields store a value like any other, but they also keep the
         old values and keep track of author and when each revision was added.
     """
@@ -126,10 +150,6 @@ class IVersioningField(Interface):
     def get_last_revision(default=None):
         """ Return last revision, or default if no revision exist.
             Will get full revision info with a dict containing author, value and created.
-        """
-
-    def get_last_revision_value(default=None):
-        """ Only return value from last revision, or default if no revision exist.
         """
 
     def get_revision(id):

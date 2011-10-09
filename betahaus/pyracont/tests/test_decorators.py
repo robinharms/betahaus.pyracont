@@ -53,3 +53,21 @@ class DecoratorSchemaFactoryTests(TestCase):
         self.config.scan('betahaus.pyracont.tests.fixtures.override_schema')
         obj = self._create_schema('DummySchema')
         self.failUnless('other_schema_node' in obj)
+
+
+class DecoratorFieldFactoryTests(TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.scan('betahaus.pyracont.fields.versioning')
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _create_field(self, name):
+        from betahaus.pyracont.interfaces import IFieldFactory
+        return self.config.registry.getUtility(IFieldFactory, name)()
+
+    def test_content_registered(self):
+        obj = self._create_field('VersioningField')
+        from betahaus.pyracont.interfaces import IBaseField
+        self.failUnless(IBaseField.providedBy(obj))

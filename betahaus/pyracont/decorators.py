@@ -3,6 +3,7 @@ from zope.component.factory import Factory
 from zope.component import getUtility
 
 from betahaus.pyracont.interfaces import IContentFactory
+from betahaus.pyracont.interfaces import IFieldFactory
 from betahaus.pyracont.interfaces import ISchemaFactory
 
 
@@ -37,3 +38,13 @@ class schema_factory(content_factory):
                           description=self.description,
                           interfaces=self.interfaces)
         scanner.config.registry.registerUtility(factory, ISchemaFactory, self.factory_name)
+
+
+class field_factory(content_factory):
+    """ Decorator for factories that create fields. """
+    def register(self, scanner, name, wrapped):
+        factory = Factory(wrapped,
+                          title=self.title,
+                          description=self.description,
+                          interfaces=self.interfaces)
+        scanner.config.registry.registerUtility(factory, IFieldFactory, self.factory_name)

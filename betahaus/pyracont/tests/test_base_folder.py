@@ -6,6 +6,7 @@ from pyramid import testing
 from zope.interface.verify import verifyObject
 from zope.interface.verify import verifyClass
 from zope.component.factory import Factory
+from zope.component.interfaces import ComponentLookupError
 
 
 class MockSchema(colander.Schema):
@@ -29,6 +30,14 @@ class BaseFolderTests(TestCase):
     def _now(self):
         from betahaus.pyracont import utcnow
         return utcnow()
+
+    def _custom_versionging_field_fixture(self):
+        self.config.scan('betahaus.pyracont.fields.versioning')
+        
+        class DummyCls(self._cut):
+            custom_fields = {'test':'VersioningField'}
+        
+        return DummyCls
 
     def test_verify_class(self):
         from betahaus.pyracont.interfaces import IBaseFolder
@@ -119,27 +128,6 @@ class BaseFolderTests(TestCase):
         obj = _CustomCls(title='Hello world')
         self.assertEqual(obj.get_field_value('title'), "I'm very custom")
 
-    def test_get_and_set_field_value_versioning_field(self):
-        class _CustomCls(self._cut):
-            versioning_fields = ('test',)
-
-        obj = _CustomCls()
-        obj.set_field_value('test', 'Hello')
-        obj.set_field_value('test', 'World')
-        self.assertEqual(obj.get_field_value('test'), 'World')
-        field = obj.get_versioning_field('test')
-        revisions = field.get_revisions()
-        self.assertEqual(revisions[1]['value'], 'Hello')        
-        self.assertEqual(revisions[2]['value'], 'World')        
-
-    def test_get_field_value_versioning_empty(self):
-        class _CustomCls(self._cut):
-            versioning_fields = ('test',)
-        
-        obj = _CustomCls()
-        marker = object()
-        self.assertEqual(obj.get_field_value('test', marker), marker)
-
     def test_set_field_value_normal_field(self):
         obj = self._cut()
         first = "Hello World"
@@ -163,6 +151,28 @@ class BaseFolderTests(TestCase):
         obj = _CustomCls()
         obj.set_field_value('title', "I am a normal title")
         self.assertEqual(obj.get_field_value('title'), "I set another title!")
+
+    def test_get_field_value_custom_field(self):
+        obj = self._custom_versionging_field_fixture()()
+        obj.set_field_value('test', 'Hello')
+        obj.set_field_value('test', 'World')
+        self.assertEqual(obj.get_field_value('test'), 'World')
+        field = obj.get_custom_field('test')
+        revisions = field.get_revisions()
+        self.assertEqual(revisions[1]['value'], 'Hello')        
+        self.assertEqual(revisions[2]['value'], 'World')
+
+    def test_get_field_value_versioning_empty(self):
+        obj = self._custom_versionging_field_fixture()()
+        marker = object()
+        self.assertEqual(obj.get_field_value('test', marker), marker)
+
+    def test_nonexistent_custom_field_factory(self):
+        class _DummyCls(self._cut):
+            custom_fields = {'test':'i_dont_exist'}
+        obj = _DummyCls()
+        self.assertRaises(ComponentLookupError, obj.set_field_value, 'test', 'hello')
+        self.assertRaises(ComponentLookupError, obj.get_field_value, 'test')
 
     def test_field_appstruct(self):
         obj = self._cut(title="Hello", userid='sven')
@@ -196,18 +206,3 @@ class BaseFolderTests(TestCase):
         obj.set_field_appstruct({'a':1, 'b':2}, notify=True)
         
         self.failUnless(IObjectUpdatedEvent.providedBy(L[0]))
-
-    def test_get_versioning_field(self):
-        from betahaus.pyracont import VersioningField
-
-        class _CustomCls(self._cut):
-            versioning_fields = ('test',)
-
-        obj = _CustomCls()
-        field = obj.get_versioning_field('test')
-        self.failUnless(isinstance(field, VersioningField))
-
-    def test_get_versioning_field_nonexistent_field(self):
-        obj = self._cut()
-        self.assertRaises(KeyError, obj.get_versioning_field, "i_dont_exist")
-

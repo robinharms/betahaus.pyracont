@@ -1,6 +1,7 @@
 from zope.component import getUtility
 
 from betahaus.pyracont.interfaces import IContentFactory
+from betahaus.pyracont.interfaces import IFieldFactory
 from betahaus.pyracont.interfaces import ISchemaFactory
 
 
@@ -22,3 +23,8 @@ def createSchema(factory_name, context, request, **kwargs):
     return schema.bind(context=context,
                 request=request,
                 **kwargs)
+
+
+def createField(factory_name, *args, **kwargs):
+    """ Create a field object. """
+    return getUtility(IFieldFactory, factory_name)(*args, **kwargs)

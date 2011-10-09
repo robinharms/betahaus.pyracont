@@ -14,7 +14,7 @@ class VersioningFieldTests(TestCase):
 
     @property
     def _cut(self):
-        from betahaus.pyracont import VersioningField
+        from betahaus.pyracont.fields.versioning import VersioningField
         return VersioningField
 
     def _now(self):
@@ -34,6 +34,12 @@ class VersioningFieldTests(TestCase):
         self.assertEqual(obj.get_current_rev_id(), 0)
         obj.add('Hello')
         self.assertEqual(obj.get_current_rev_id(), 1)
+
+    def test_set(self):
+        """ Set is almost same as add. Important for compatibility when field is not directly accessed. """
+        obj = self._cut()
+        obj.set('hello')
+        self.assertEqual(obj.get(), 'hello')
 
     def test_add(self):
         obj = self._cut()
@@ -74,15 +80,13 @@ class VersioningFieldTests(TestCase):
         res = obj.get_last_revision(marker)
         self.assertEqual(res, marker)
 
-
-    def test_get_last_revision_value(self):
+    def test_get(self):
         now = self._now()
         obj = self._cut()
         obj.add('Hello')
         obj.add('World')
         obj.add('!', author='hi', created=now)
-        self.assertEqual(obj.get_last_revision_value(), '!')
-
+        self.assertEqual(obj.get(), '!')
 
     def test_get_revision(self):
         now = self._now()

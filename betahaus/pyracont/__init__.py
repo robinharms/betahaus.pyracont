@@ -8,16 +8,10 @@ from zope.interface import implements
 from repoze.folder import Folder
 from repoze.folder import unicodify
 from BTrees.OOBTree import OOBTree
-from BTrees.LOBTree import LOBTree
-from persistent import Persistent
-from pyramid.threadlocal import get_current_request
-from pyramid.security import authenticated_userid
 
 from betahaus.pyracont.interfaces import IBaseFolder
-from betahaus.pyracont.interfaces import IVersioningField
 from betahaus.pyracont.events import ObjectUpdatedEvent
-from betahaus.pyracont.factories import createContent
-from zope.component.interfaces import ComponentLookupError
+from betahaus.pyracont.factories import createField, createContent
 
 
 class BaseFolder(Folder):
@@ -28,7 +22,7 @@ class BaseFolder(Folder):
     allowed_contexts = ()
     custom_accessors = {}
     custom_mutators = {}
-    versioning_fields = ()
+    custom_fields = {}
 
     def __init__(self, data=None, **kwargs):
         super(BaseFolder, self).__init__(data=data)
@@ -80,8 +74,9 @@ class BaseFolder(Folder):
             if isinstance(accessor, basestring):
                 accessor = getattr(self, accessor)
             return accessor(default=default, key=key)
-        if key in self.versioning_fields:
-            return self._get_versioning_field_value(key, default=default)
+        if key in self.custom_fields:
+            field = self.get_custom_field(key)
+            return field.get(default=default)
         return self._field_storage.get(key, default)
 
     def set_field_value(self, key, value):
@@ -96,8 +91,9 @@ class BaseFolder(Folder):
                 mutator = getattr(self, mutator)
             mutator(value, key=key)
             return
-        if key in self.versioning_fields:
-            self._set_versioning_field_value(key, value)
+        if key in self.custom_fields:
+            field = self.get_custom_field(key)
+            field.set(value)
             return
         self._field_storage[key] = value
 
@@ -133,105 +129,14 @@ class BaseFolder(Folder):
                 self.mark_modified()
         return updated
 
-    def get_versioning_field(self, key):
-        """ Return versioning field. Create it if it doesn't exist. """
-        if key not in self.versioning_fields:
-            raise KeyError("There's no versioning field called '%s'" % key)
+    def get_custom_field(self, key):
+        if key not in self.custom_fields:
+            raise KeyError("There's no custom field defined in custom_fields with the name '%s'" % key)
         if key not in self._field_storage:
-            try:
-                field = createContent('VersioningField')
-            except ComponentLookupError:
-                field = VersioningField()
+            field_type = self.custom_fields[key]
+            field = createField(field_type, key=key)
             self._field_storage[key] = field
         return self._field_storage[key]
-
-    def _get_versioning_field_value(self, key, default=None):
-        field = self.get_versioning_field(key)
-        value = field.get_last_revision_value(default=default)
-        if value == default:
-            return default
-        return value
-
-    def _set_versioning_field_value(self, key, value):
-        field = self.get_versioning_field(key)
-        field.add(value)
-
-
-class VersioningField(Persistent):
-    """ Field that has versioning rather than just storing one value. """
-    implements(IVersioningField)
-
-    def __init__(self):
-        self.__revision_values__ = LOBTree()
-        self.__revision_authors__ = LOBTree()
-        self.__revision_created_timestamps__ = LOBTree()
-
-    @property
-    def _revision_values(self):
-        return self.__revision_values__
-    
-    @property
-    def _revision_authors(self):
-        return self.__revision_authors__
-
-    @property
-    def _revision_created_timestamps(self):
-        return self.__revision_created_timestamps__
-
-    def get_current_rev_id(self):
-        if len(self._revision_values) == 0:
-            return 0
-        return self._revision_values.maxKey()
-
-    def add(self, value, author=None, created=None):
-        if created is None:
-            created = utcnow()
-        assert isinstance(created, datetime)
-        if author is None:
-            request = get_current_request()
-            author = authenticated_userid(request)
-        #author might still be None, if this is run by a script or by an unauthenticated user
-        id = self.get_current_rev_id()+1
-        self._revision_values[id] = value
-        self._revision_authors[id] = author
-        self._revision_created_timestamps[id] = created
-    
-    def remove(self, id):
-        del self._revision_values[id]
-        del self._revision_authors[id]
-        del self._revision_created_timestamps[id]
-
-    def get_last_revision(self, default=None):
-        if not len(self._revision_values):
-            return default
-        id = self.get_current_rev_id()
-        return self.get_revision(id)
-
-    def get_last_revision_value(self, default=None):
-        if not len(self._revision_values):
-            return default
-        id = self.get_current_rev_id()
-        return self._revision_values[id]
-
-    def get_revision(self, id):
-        result = {}
-        result['value'] = self._revision_values[id]
-        result['author'] = self._revision_authors[id]
-        result['created'] = self._revision_created_timestamps[id]
-        return result
-
-    def get_revisions(self):
-        results = {}
-        for k in self._revision_values:
-            rev = {}
-            rev['value'] = self._revision_values[k]
-            rev['author'] = self._revision_authors[k]
-            rev['created'] = self._revision_created_timestamps[k]
-            results[k] = rev
-        return results
-
-    def __len__(self):
-        return len(self._revision_values)
 
 
 def utcnow():
