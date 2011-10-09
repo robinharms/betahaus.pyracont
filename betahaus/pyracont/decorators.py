@@ -17,8 +17,9 @@ class content_factory(object):
         self.interfaces = interfaces
 
     def register(self, scanner, name, wrapped):
+        title = self.title and self.title or self.factory_name
         factory = Factory(wrapped,
-                          title=self.title,
+                          title=title,
                           description=self.description,
                           interfaces=self.interfaces)
         scanner.config.registry.registerUtility(factory, IContentFactory, self.factory_name)

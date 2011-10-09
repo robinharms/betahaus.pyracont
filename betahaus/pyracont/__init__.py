@@ -32,6 +32,7 @@ class BaseFolder(Folder):
 
     def __init__(self, data=None, **kwargs):
         super(BaseFolder, self).__init__(data=data)
+        self.__field_storage__ = OOBTree()
         if 'created' not in kwargs:
             kwargs['created'] = utcnow()
         if 'modified' not in kwargs:
@@ -58,8 +59,6 @@ class BaseFolder(Folder):
 
     @property
     def _field_storage(self):
-        if not hasattr(self, '__field_storage__'):
-            self.__field_storage__ = OOBTree()
         return self.__field_storage__
 
     def suggest_name(self, parent):
@@ -67,7 +66,7 @@ class BaseFolder(Folder):
         """
         title = self.title
         if not title:
-            raise ValueError("Title can't be empty to use suggest_name")
+            raise ValueError("title property didn't return any text.")
         return generate_slug(parent, title)
 
     def mark_modified(self):
