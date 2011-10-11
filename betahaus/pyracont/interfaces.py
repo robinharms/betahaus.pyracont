@@ -78,15 +78,16 @@ class IBaseFolder(Interface):
         """ Return field value, or default.
             The lookup order is as follows:
             - Check if there's a custom accessor.
-            - Check if the field is a versioning field.
+            - Check if the field is a custom field.
             - Retrieve data from normal storage and return.
         """
     
-    def set_field_value(key, value):
+    def set_field_value(key, value, override=False):
         """ Set field value.
             Will not send events, so use this if you silently want to change a single field.
             You can override field behaviour by either setting custom mutators
-            or make a field a versioning field. It has the same priority and orders as get_field_value
+            or make a field a custom field.
+            override bypasses any custom mutators. Good idea if you're calling from a custom mutator.
         """
 
     def get_field_appstruct(schema):
@@ -94,7 +95,6 @@ class IBaseFolder(Interface):
             Deform expects input like this when rendering already saved values.
             Versioning fields will be represented with their current value.
         """
-
 
     def set_field_appstruct(values, notify=True, mark_modified=True):
         """ Set values from a dict or similar key/value object.
@@ -160,4 +160,14 @@ class IVersioningField(IBaseField):
         """ Return a dict of all revisions with revision number as key, and value will be each revisions info.
             Example: {1:{'value':'Hello', 'author':'some_userid', 'created':'<datetime>'}, 2:{<etc...>}}
         """
-        
+
+
+class IPasswordField(IBaseField):
+    """ Stores SHA1-value (as default) instead of plaintext. """
+
+    min_length = Attribute("Min length of password. Default 5")
+    hash_method = Attribute("Callable method to hash passwords with. Defaults to SHA1. Custom method must accept a single value.")
+
+    def check_input(value):
+        """ Accepts plaintext, uses hash_method on it an compairs the result.
+        """

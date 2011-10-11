@@ -37,7 +37,7 @@ class BaseFolder(Folder):
 
     @property
     def title(self):
-        return self.get_field_value('title', '')
+        return self.get_field_value('title', u'')
 
     @property
     def created(self):
@@ -79,19 +79,20 @@ class BaseFolder(Folder):
             return field.get(default=default)
         return self._field_storage.get(key, default)
 
-    def set_field_value(self, key, value):
+    def set_field_value(self, key, value, override=False):
         """ Set field value.
             Will not send events, so use this if you silently want to change a single field.
             You can override field behaviour by either setting custom mutators
-            or make a field a versioning field.
+            or make a field a custom field.
+            override bypasses any custom mutators. Good idea if you're calling from a custom mutator.
         """
-        if key in self.custom_mutators:
+        if not override and key in self.custom_mutators:
             mutator = self.custom_mutators[key]
             if isinstance(mutator, basestring):
                 mutator = getattr(self, mutator)
             mutator(value, key=key)
             return
-        if key in self.custom_fields:
+        if not override and key in self.custom_fields:
             field = self.get_custom_field(key)
             field.set(value)
             return

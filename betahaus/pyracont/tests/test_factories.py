@@ -62,9 +62,7 @@ class CreateSchemaTests(TestCase):
         self.failUnless(isinstance(obj, colander.SchemaNode))
 
     def test_create_schema(self):
-        context = None
-        request = None
-        obj = self._fut('DummySchema', context, request)
+        obj = self._fut('DummySchema')
         #Note: Instantiated schemas are SchemaNodes themselves!
         self.failUnless(isinstance(obj, colander.SchemaNode))
 

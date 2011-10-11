@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from BTrees.LOBTree import LOBTree
-from persistent import Persistent
 from pyramid.threadlocal import get_current_request
 from pyramid.security import authenticated_userid
 from zope.interface import implements
