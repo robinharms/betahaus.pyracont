@@ -11,7 +11,7 @@ from BTrees.OOBTree import OOBTree
 
 from betahaus.pyracont.interfaces import IBaseFolder
 from betahaus.pyracont.events import ObjectUpdatedEvent
-from betahaus.pyracont.factories import createField, createContent
+from betahaus.pyracont.factories import createField
 
 
 class BaseFolder(Folder):
