@@ -168,6 +168,18 @@ class IPasswordField(IBaseField):
     min_length = Attribute("Min length of password. Default 5")
     hash_method = Attribute("Callable method to hash passwords with. Defaults to SHA1. Custom method must accept a single value.")
 
+
+    def get(default=None):
+        """ Get hashed value or default if field is set as None. """
+
+    def set(value):
+        """ Hash value and store it. """
+
     def check_input(value):
-        """ Accepts plaintext, uses hash_method on it an compairs the result.
+        """ Accepts plaintext, uses hash_method on it an compares the result.
+            Will always be False if password isn't set.
+        """
+
+    def clear_password():
+        """ Removes stored password and set the field as None.
         """

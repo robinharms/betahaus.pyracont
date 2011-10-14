@@ -174,6 +174,12 @@ class BaseFolderTests(TestCase):
         self.assertRaises(ComponentLookupError, obj.set_field_value, 'test', 'hello')
         self.assertRaises(ComponentLookupError, obj.get_field_value, 'test')
 
+    def test_get_custom_field_missing_key_in_custom_fields(self):
+        class _DummyCls(self._cut):
+            custom_fields = {'hello':'whatever'}        
+        obj = _DummyCls()
+        self.assertRaises(KeyError, obj.get_custom_field, 'field_404')
+
     def test_field_appstruct(self):
         obj = self._cut(title="Hello", userid='sven')
         schema = MockSchema()

@@ -44,3 +44,32 @@ class PasswordFieldTests(TestCase):
     def test_min_length(self):
         obj = self._cut(min_length = 100)
         self.assertRaises(ValueError, obj.set, 'hello')
+
+    def test_get_with_no_password_set(self):
+        obj = self._cut()
+        marker = object()
+        self.assertEqual(obj.get(marker), marker)
+
+    def test_clear_password(self):
+        obj = self._cut()
+        obj.set('hello')
+        #Just to make sure...
+        self.failUnless(obj.get().startswith('SHA1'))
+        obj.clear_password()
+        marker = object()
+        self.assertEqual(obj.get(marker), marker)
+
+    def test_check_input_matching_pw(self):
+        obj = self._cut()
+        obj.set('hello')
+        self.assertEqual(obj.check_input('hello'), True)
+
+    def test_check_input_with_bad_input(self):
+        obj = self._cut()
+        obj.set('hello')
+        self.assertRaises(TypeError, obj.check_input, None)
+        self.assertRaises(TypeError, obj.check_input, object())
+
+    def test_check_input_no_pw_set(self):
+        obj = self._cut()
+        self.assertEqual(obj.check_input('pw'), False)

@@ -14,6 +14,9 @@ def get_sha_password(password):
     return 'SHA1:' + sha1(password).hexdigest()
 
 
+_marker = object()
+
+
 @field_factory('PasswordField')
 class PasswordField(BaseField):
     """ Field that stores hash of passed value. """
@@ -45,7 +48,14 @@ class PasswordField(BaseField):
         self.__encrypted_password__ = self.hash_method(value)
 
     def check_input(self, value):
-        assert value is not None
+        if not isinstance(value, basestring):
+            raise TypeError("check_input only accepts strings as input, got %s" % value)
+        encrypted = self.get(default=_marker)
+        if encrypted is _marker:
+            return False
         if not isinstance(value, unicode):
             value = unicodify(value)
-        return self.hash_method(value) == self.__encrypted_password__
+        return self.hash_method(value) == encrypted
+
+    def clear_password(self):
+        self.__encrypted_password__ = None
