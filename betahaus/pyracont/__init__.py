@@ -54,8 +54,10 @@ class BaseFolder(Folder):
         return self.get_field_value('uid')
 
     @property
-    def _field_storage(self):
+    def field_storage(self):
         return self.__field_storage__
+    #b/c compat
+    _field_storage = field_storage
 
     def suggest_name(self, parent):
         """ Suggest a name if this content would be added to parent.
@@ -67,7 +69,7 @@ class BaseFolder(Folder):
 
     def mark_modified(self):
         """ Mark content as modified. """
-        self._field_storage['modified'] = utcnow()
+        self.field_storage['modified'] = utcnow()
 
     def get_field_value(self, key, default=None):
         """ Return field value, or default """        
@@ -81,7 +83,7 @@ class BaseFolder(Folder):
         if key in self.custom_fields:
             field = self.get_custom_field(key)
             return field.get(default=default)
-        return self._field_storage.get(key, default)
+        return self.field_storage.get(key, default)
 
     def set_field_value(self, key, value, override=False):
         """ Set field value.
@@ -102,7 +104,7 @@ class BaseFolder(Folder):
             field = self.get_custom_field(key)
             field.set(value)
             return
-        self._field_storage[key] = value
+        self.field_storage[key] = value
 
     def get_field_appstruct(self, schema):
         """ Return a dict of all fields and their values.
@@ -139,11 +141,11 @@ class BaseFolder(Folder):
     def get_custom_field(self, key):
         if key not in self.custom_fields:
             raise KeyError("There's no custom field defined in custom_fields with the name '%s'" % key)
-        if key not in self._field_storage:
+        if key not in self.field_storage:
             field_type = self.custom_fields[key]
             field = createField(field_type, key=key)
-            self._field_storage[key] = field
-        return self._field_storage[key]
+            self.field_storage[key] = field
+        return self.field_storage[key]
 
 
 def utcnow():

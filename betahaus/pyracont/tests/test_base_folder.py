@@ -7,6 +7,7 @@ from zope.interface.verify import verifyObject
 from zope.interface.verify import verifyClass
 from zope.component.factory import Factory
 from zope.component.interfaces import ComponentLookupError
+from BTrees.OOBTree import OOBTree
 
 from betahaus.pyracont.exceptions import CustomFunctionLoopError
 
@@ -209,10 +210,8 @@ class BaseFolderTests(TestCase):
         def subscriber(obj, event):
             L.append(event)
         self.config.add_subscriber(subscriber, (IBaseFolder, IObjectUpdatedEvent,))
-        
         obj = self._cut()
         obj.set_field_appstruct({'a':1, 'b':2}, notify=True)
-        
         self.failUnless(IObjectUpdatedEvent.providedBy(L[0]))
 
     def test_avoid_loops_on_custom_accessors(self):
@@ -238,3 +237,7 @@ class BaseFolderTests(TestCase):
         
         obj = _DummyCls()
         self.assertRaises(CustomFunctionLoopError, obj.set_field_value, 'test', 'value')
+
+    def test_field_storage(self):
+        obj = self._cut()
+        self.assertTrue(isinstance(obj.field_storage, OOBTree))

@@ -44,21 +44,31 @@ class IBaseFolder(Interface):
     schemas = Attribute(
         """ Dict that contains a mapping for action -> schema factory name.
             Example:{'edit':'site_root_edit_schema'}.""")
+
     allowed_contexts = Attribute(
         " List of which contexts this content is allowed in. Should correspond to content_type")
+
     content_type = Attribute("The id of this content type.")
+
     custom_accessors = Attribute(
         """ Dict of custom accessors to use. The key is which field to override,
             value should be a string which represent a callable on this class, or a callable method.
             The accessor method must accept default and key as kwarg.""")
+
     custom_mutators = Attribute(
         """ Same as custon accessor, but the callable must accept a value.
             The mutator method must accept value as argument.
             Method must also accept key as kwarg.""")
+
     custom_fields = Attribute(
         """ A dict of fields consisting of key (field name) and field factory name.
             A field type must be registered with that factory name.
-            Example: {'wiki_text':'VersioningField'} if your register a field factory with the name 'VersioningField'.""")
+            Example: {'wiki_text':'VersioningField'} if your register a field factory
+            with the name 'VersioningField'.""")
+
+    field_storage = Attribute(
+        """ An OOBTree storage for field values. The point of exposing this
+            is to enable bypass of custom mutators or accessors.""")
 
     def __init__(data=None, **kwargs):
         """ Init class. Any kwargs passed will be stored in this content. """
