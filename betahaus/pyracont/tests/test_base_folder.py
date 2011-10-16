@@ -8,6 +8,8 @@ from zope.interface.verify import verifyClass
 from zope.component.factory import Factory
 from zope.component.interfaces import ComponentLookupError
 
+from betahaus.pyracont.exceptions import CustomFunctionLoopError
+
 
 class MockSchema(colander.Schema):
     title = colander.SchemaNode(colander.String())
@@ -212,3 +214,27 @@ class BaseFolderTests(TestCase):
         obj.set_field_appstruct({'a':1, 'b':2}, notify=True)
         
         self.failUnless(IObjectUpdatedEvent.providedBy(L[0]))
+
+    def test_avoid_loops_on_custom_accessors(self):
+
+        class _DummyCls(self._cut):
+            """ This class will create a loop, since the custom accessor calls itself
+            """
+            custom_accessors = {'test':'get_test'}
+            def get_test(self, **kwargs):
+                return self.get_field_value('test')
+        
+        obj = _DummyCls()
+        self.assertRaises(CustomFunctionLoopError, obj.get_field_value, 'test')
+
+    def test_avoid_loops_on_custom_mutators(self):
+
+        class _DummyCls(self._cut):
+            """ This class will create a loop, since the custom mutator calls itself
+            """
+            custom_mutators = {'test':'set_test'}
+            def set_test(self, value, **kwargs):
+                return self.set_field_value('test', value)
+        
+        obj = _DummyCls()
+        self.assertRaises(CustomFunctionLoopError, obj.set_field_value, 'test', 'value')

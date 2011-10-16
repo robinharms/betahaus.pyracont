@@ -1,5 +1,6 @@
 from uuid import uuid4
 from datetime import datetime
+import inspect
 
 import pytz
 from slugify import slugify
@@ -12,6 +13,7 @@ from BTrees.OOBTree import OOBTree
 from betahaus.pyracont.interfaces import IBaseFolder
 from betahaus.pyracont.events import ObjectUpdatedEvent
 from betahaus.pyracont.factories import createField
+from betahaus.pyracont.exceptions import CustomFunctionLoopError
 
 
 class BaseFolder(Folder):
@@ -68,8 +70,10 @@ class BaseFolder(Folder):
         self._field_storage['modified'] = utcnow()
 
     def get_field_value(self, key, default=None):
-        """ Return field value, or default """
+        """ Return field value, or default """        
         if key in self.custom_accessors:
+            if inspect.stack()[2][3] == 'get_field_value':
+                raise CustomFunctionLoopError("Custom accessor with key '%s' tried to call get_field_value." % key)
             accessor = self.custom_accessors[key]
             if isinstance(accessor, basestring):
                 accessor = getattr(self, accessor)
@@ -87,6 +91,8 @@ class BaseFolder(Folder):
             override bypasses any custom mutators. Good idea if you're calling from a custom mutator.
         """
         if not override and key in self.custom_mutators:
+            if inspect.stack()[2][3] == 'set_field_value':
+                raise CustomFunctionLoopError("Custom mutator with key '%s' tried to call set_field_value." % key)
             mutator = self.custom_mutators[key]
             if isinstance(mutator, basestring):
                 mutator = getattr(self, mutator)
