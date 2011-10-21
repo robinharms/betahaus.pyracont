@@ -85,14 +85,13 @@ class BaseFolder(Folder):
             return field.get(default=default)
         return self.field_storage.get(key, default)
 
-    def set_field_value(self, key, value, override=False):
+    def set_field_value(self, key, value):
         """ Set field value.
             Will not send events, so use this if you silently want to change a single field.
             You can override field behaviour by either setting custom mutators
             or make a field a custom field.
-            override bypasses any custom mutators. Good idea if you're calling from a custom mutator.
         """
-        if not override and key in self.custom_mutators:
+        if key in self.custom_mutators:
             if inspect.stack()[2][3] == 'set_field_value':
                 raise CustomFunctionLoopError("Custom mutator with key '%s' tried to call set_field_value." % key)
             mutator = self.custom_mutators[key]
@@ -100,7 +99,7 @@ class BaseFolder(Folder):
                 mutator = getattr(self, mutator)
             mutator(value, key=key)
             return
-        if not override and key in self.custom_fields:
+        if key in self.custom_fields:
             field = self.get_custom_field(key)
             field.set(value)
             return

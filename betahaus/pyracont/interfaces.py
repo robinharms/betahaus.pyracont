@@ -92,12 +92,11 @@ class IBaseFolder(Interface):
             - Retrieve data from normal storage and return.
         """
     
-    def set_field_value(key, value, override=False):
+    def set_field_value(key, value):
         """ Set field value.
             Will not send events, so use this if you silently want to change a single field.
             You can override field behaviour by either setting custom mutators
             or make a field a custom field.
-            override bypasses any custom mutators. Good idea if you're calling from a custom mutator.
         """
 
     def get_field_appstruct(schema):
