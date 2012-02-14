@@ -1,3 +1,10 @@
+0.1a2
+-----
+
+- If title and descriptions are specified for the schema factory, also transfer
+  them to the schema itself. (Colander Schemas are transfered to Schema nodes on
+  construction, which enables title and description) [sassur]
+
 0.1a1
 -----
 

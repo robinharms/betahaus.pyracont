@@ -15,7 +15,7 @@ requires = ('pyramid',
             )
 
 setup(name='betahaus.pyracont',
-      version='0.1a1',
+      version='0.1a2',
       description='betahaus.pyracont',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -27,7 +27,7 @@ setup(name='betahaus.pyracont',
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Development Status :: 3 - Alpha",
         ],
-      author='Robin Harms Oredsson',
+      author='Robin Harms Oredsson and contributors',
       author_email='robin@betahaus.net',
       url='https://github.com/robinharms/betahaus.pyracont',
       keywords='web pyramid pylons',
