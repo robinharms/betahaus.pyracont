@@ -17,7 +17,7 @@ def createSchema(factory_name, **kwargs):
     factory = getUtility(ISchemaFactory, factory_name)
     schema = factory(**kwargs)
     schema.title = factory.title
-    schema.decription = factory.description
+    schema.description = factory.description
     return schema
 
 

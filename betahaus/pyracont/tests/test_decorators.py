@@ -3,6 +3,7 @@ from unittest import TestCase
 import colander
 from pyramid import testing
 
+from betahaus.pyracont.interfaces import ISchemaFactory
 from betahaus.pyracont.tests.fixtures.contents import DummyContent
 from betahaus.pyracont.tests.fixtures.override_content import OtherContent
 from betahaus.pyracont.tests.fixtures.schemas import DummySchema
@@ -40,7 +41,6 @@ class DecoratorSchemaFactoryTests(TestCase):
         testing.tearDown()
 
     def _create_schema(self, name):
-        from betahaus.pyracont.interfaces import ISchemaFactory
         return self.config.registry.getUtility(ISchemaFactory, name)()
 
     def test_content_registered(self):
@@ -53,6 +53,17 @@ class DecoratorSchemaFactoryTests(TestCase):
         self.config.scan('betahaus.pyracont.tests.fixtures.override_schema')
         obj = self._create_schema('DummySchema')
         self.failUnless('other_schema_node' in obj)
+
+    def _get_factory(self):
+        return self.config.registry.getUtility(ISchemaFactory, 'DummySchema')
+
+    def test_title_picked_up(self):
+        obj = self._get_factory()
+        self.assertEqual(obj.title, u"dummy schema title")
+
+    def test_description_picked_up(self):
+        obj = self._get_factory()
+        self.assertEqual(obj.description, u"dummy schema description")
 
 
 class DecoratorFieldFactoryTests(TestCase):

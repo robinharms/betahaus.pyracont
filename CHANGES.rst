@@ -1,3 +1,9 @@
+0.1a3
+-----
+
+- Typo on code caused description to be stored under the wrong attribute of
+  the schema when using createSchema. [robinharms]
+
 0.1a2
 -----
 

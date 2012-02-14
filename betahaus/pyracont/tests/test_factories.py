@@ -6,6 +6,9 @@ from zope.interface.verify import verifyObject
 from zope.component import createObject
 from zope.component.factory import Factory
 
+from betahaus.pyracont.interfaces import ISchemaFactory
+from betahaus.pyracont.interfaces import IContentFactory
+from betahaus.pyracont.interfaces import IFieldFactory
 from betahaus.pyracont.tests.fixtures.schemas import DummySchema
 
 
@@ -18,7 +21,6 @@ class CreateContentTests(TestCase):
         testing.tearDown()
 
     def _register_factory(self):
-        from betahaus.pyracont.interfaces import IContentFactory
         factory = Factory(testing.DummyModel, 'DummyModel')
         self.config.registry.registerUtility(factory, IContentFactory, 'DummyModel')
 
@@ -46,14 +48,18 @@ class CreateSchemaTests(TestCase):
         testing.tearDown()
 
     def _register_factory(self):
-        from betahaus.pyracont.interfaces import ISchemaFactory
         factory = Factory(DummySchema, 'DummySchema')
+        factory.title = u"dummy schema title"
+        factory.description = u"dummy schema description"
         self.config.registry.registerUtility(factory, ISchemaFactory, 'DummySchema')
 
     @property
     def _fut(self):
         from betahaus.pyracont.factories import createSchema
         return createSchema
+
+    def _get_factory(self):
+        return self.config.registry.getUtility(ISchemaFactory, 'DummySchema')
 
     def test_create_object(self):
         """ Should return the same as createSchema. """
@@ -65,9 +71,18 @@ class CreateSchemaTests(TestCase):
         obj = self._fut('DummySchema')
         #Note: Instantiated schemas are SchemaNodes themselves!
         self.failUnless(isinstance(obj, colander.SchemaNode))
-        # check title and description
-        self.assertIsNotNone(obj.title)
-        self.assertIsNotNone(obj.decription)
+
+    def test_title_from_factory(self):
+        factory = self._get_factory()
+        obj = self._fut('DummySchema')
+        self.assertEqual("dummy schema title", obj.title)
+        self.assertEqual(factory.title, obj.title)
+
+    def test_description_from_factory(self):
+        factory = self._get_factory()
+        obj = self._fut('DummySchema')
+        self.assertEqual("dummy schema description", obj.description)
+        self.assertEqual(factory.description, obj.description)
 
 
 class CreateFieldTests(TestCase):
@@ -84,7 +99,6 @@ class CreateFieldTests(TestCase):
         return BaseField
 
     def _register_factory(self):
-        from betahaus.pyracont.interfaces import IFieldFactory
         factory = Factory(self._field_cls, 'BaseField')
         self.config.registry.registerUtility(factory, IFieldFactory, 'BaseField')
 
