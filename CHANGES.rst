@@ -1,18 +1,24 @@
-0.1a3
------
+
+0.1dev - (unreleased)
+---------------------
+
+
+
+0.1a3 - 2012-02-14
+-------------------
 
 - Typo on code caused description to be stored under the wrong attribute of
   the schema when using createSchema. [robinharms]
 
-0.1a2
------
+0.1a2 - 2012-02-14
+------------------
 
 - If title and descriptions are specified for the schema factory, also transfer
   them to the schema itself. (Colander Schemas are transfered to Schema nodes on
   construction, which enables title and description) [sassur]
 
-0.1a1
------
+0.1a1 - 2011-10-14
+------------------
 
 - Exception raised when custom accessors or mutators created a loop. [robinharms]
 - Exposing field_storage as a public attribute should remove the need to
