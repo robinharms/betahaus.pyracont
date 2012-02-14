@@ -14,7 +14,11 @@ def createContent(factory_name, *args, **kwargs):
 def createSchema(factory_name, **kwargs):
     """ Create a colander schema object.
     """
-    return getUtility(ISchemaFactory, factory_name)(**kwargs)
+    factory = getUtility(ISchemaFactory, factory_name)
+    schema = factory(**kwargs)
+    schema.title = factory.title
+    schema.decription = factory.description
+    return schema
 
 
 def createField(factory_name, *args, **kwargs):

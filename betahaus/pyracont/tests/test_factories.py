@@ -65,6 +65,9 @@ class CreateSchemaTests(TestCase):
         obj = self._fut('DummySchema')
         #Note: Instantiated schemas are SchemaNodes themselves!
         self.failUnless(isinstance(obj, colander.SchemaNode))
+        # check title and description
+        self.assertIsNotNone(obj.title)
+        self.assertIsNotNone(obj.decription)
 
 
 class CreateFieldTests(TestCase):
