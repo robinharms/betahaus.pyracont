@@ -1,6 +1,7 @@
 from zope.component.interfaces import IFactory
 from zope.interface import Attribute
 from zope.interface import Interface
+from repoze.folder.interfaces import IFolder
 
 
 class IContentFactory(IFactory):
@@ -32,7 +33,7 @@ class IObjectUpdatedEvent(Interface):
         """
     
 
-class IBaseFolder(Interface):
+class IBaseFolder(IFolder):
     """ Base content type for all regular persistent models."""
     title = Attribute("Title")
     created = Attribute(
