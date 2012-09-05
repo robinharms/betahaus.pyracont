@@ -6,9 +6,13 @@ import pytz
 from slugify import slugify
 from zope.component.event import objectEventNotify
 from zope.interface import implements
+from zope.interface import providedBy
 from repoze.folder import Folder
 from repoze.folder import unicodify
 from BTrees.OOBTree import OOBTree
+from pyramid.threadlocal import get_current_request
+from pyramid.interfaces import IView
+from pyramid.interfaces import IViewClassifier
 
 from betahaus.pyracont.interfaces import IBaseFolder
 from betahaus.pyracont.events import ObjectUpdatedEvent
@@ -158,6 +162,18 @@ def utcnow():
     return pytz.utc.localize(naive_utcnow)
 
 
+def check_unique_name(context, request, name):
+    """ Check if there's an object with the same name or a registered view with the same name.
+        If there is, return False.
+    """
+    if name in context:
+        return False
+    provides = [IViewClassifier] + map(providedBy, (request, context))
+    if request.registry.adapters.lookup(provides, IView, name=name):
+        return False
+    return True
+
+
 def generate_slug(parent, text, limit=20):
     """ Suggest a name for content that will be added.
         text is a title or similar to be used.
@@ -166,9 +182,10 @@ def generate_slug(parent, text, limit=20):
     suggestion = slugify(text[:limit])
     if not len(suggestion):
         raise ValueError("When text was made URL-friendly, nothing remained.")
+    request = get_current_request()
 
     #Is the suggested ID already unique?
-    if suggestion not in parent:
+    if check_unique_name(parent, request, suggestion):
         return suggestion
     
     #ID isn't unique, let's try to generate a unique one.
@@ -176,7 +193,7 @@ def generate_slug(parent, text, limit=20):
     i = 1
     while i <= RETRY:
         new_s = "%s-%s" % (suggestion, str(i))
-        if new_s not in parent:
+        if check_unique_name(parent, request, new_s):
             return new_s
         i += 1
     #If no id was found, don't just continue

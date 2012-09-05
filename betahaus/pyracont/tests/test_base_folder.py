@@ -20,7 +20,8 @@ class MockSchema(colander.Schema):
 
 class BaseFolderTests(TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request = request)
 
     def tearDown(self):
         testing.tearDown()

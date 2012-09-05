@@ -2,7 +2,8 @@
 0.1dev - (unreleased)
 ---------------------
 
-
+- New method to make sure new objects aren't stored with the same name as an
+  existing view. Before it was possible to name objects the same way as views.
 
 0.1a3 - 2012-02-14
 -------------------
