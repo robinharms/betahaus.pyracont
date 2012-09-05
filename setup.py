@@ -15,7 +15,7 @@ requires = ('pyramid',
             )
 
 setup(name='betahaus.pyracont',
-      version='0.1dev',
+      version='0.1a4',
       description='betahaus.pyracont',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
