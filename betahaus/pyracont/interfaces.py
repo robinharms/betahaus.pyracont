@@ -21,13 +21,19 @@ class IFieldFactory(IFactory):
 class ITransformUtil(Interface):
     """ """
 
-    def schema_out(appstruct, schema, **kw):
+    def output(appstruct, schema, **kw):
         pass
     
-    def schema_in(appstruct, schema, **kw):
+    def input(appstruct, schema, **kw):
         pass
 
+    def transform_node(appstruct, node_name, chain, **kw):
+        pass
+    def apply_transformations(appstruct, schema, attr, **kw):
+        pass
 
+    def get_chain(chain_name):
+        """ Get a list of the transformation tools to use. """
 
 
 class ITransformation(Interface):

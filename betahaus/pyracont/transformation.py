@@ -11,10 +11,10 @@ class TransformUtil(object):
     """ """
     implements(ITransformUtil)
 
-    def schema_out(self, appstruct, schema, **kw):
+    def output(self, appstruct, schema, **kw):
         return self.apply_transformations(appstruct, schema, 'transform_out', **kw)
 
-    def schema_in(self, appstruct, schema, **kw):
+    def input(self, appstruct, schema, **kw):
         return self.apply_transformations(appstruct, schema, 'transform_in', **kw)
 
     def transform_node(self, appstruct, node_name, chain, **kw):
@@ -37,7 +37,7 @@ class TransformUtil(object):
             #Sequence objects should be recursed into
             if isinstance(node.typ, colander.Sequence):
                 print 'sequence'
-                for sub_app in appstruct[node.name]:
+                for sub_app in appstruct.get(node.name, ()):
                     self.apply_transformations(sub_app, node, attr, **kw)
                 continue
             else:
@@ -105,3 +105,8 @@ class Transformation(object):
 
     def __call__(self, appstruct, node_name, **kw):
         raise NotImplementedError("Must be implemented by subclass")
+
+
+def includeme(config):
+    """ Register transformation util. """
+    config.registry.registerUtility(TransformUtil())

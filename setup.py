@@ -15,7 +15,7 @@ requires = ('pyramid',
             )
 
 setup(name='betahaus.pyracont',
-      version='0.1a4',
+      version='0.1a5',
       description='betahaus.pyracont',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -38,6 +38,8 @@ setup(name='betahaus.pyracont',
       tests_require=requires,
       test_suite="betahaus.pyracont",
       entry_points = """\
+      [paste.app_factory]
+      main = betahaus.pyracont.demoapp:main
       """,
       paster_plugins=['pyramid'],
       )

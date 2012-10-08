@@ -5,6 +5,7 @@ from zope.component import getUtility
 from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.interfaces import IFieldFactory
 from betahaus.pyracont.interfaces import ISchemaFactory
+from betahaus.pyracont.interfaces import ITransformation
 
 
 class content_factory(object):
@@ -48,3 +49,19 @@ class field_factory(content_factory):
                           description=self.description,
                           interfaces=self.interfaces)
         scanner.config.registry.registerUtility(factory, IFieldFactory, self.factory_name)
+
+
+class transformator(object):
+    """ Decorator for classes that preform a text transformation. """
+    #FIXME: Preform check on registered transformation class
+    venusian = venusian
+
+    def __init__(self, transformation_name):
+        self.transformation_name = transformation_name
+
+    def register(self, scanner, name, wrapped):
+        scanner.config.registry.registerUtility(wrapped(), name = self.transformation_name)
+
+    def __call__(self, wrapped):
+        self.venusian.attach(wrapped, self.register, category='pyracont')
+        return wrapped
