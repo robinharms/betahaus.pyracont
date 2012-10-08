@@ -18,6 +18,27 @@ class IFieldFactory(IFactory):
     """ Factory for fields. Works the same way as IFactory. """
 
 
+class ITransformUtil(Interface):
+    """ """
+
+    def schema_out(appstruct, schema, **kw):
+        pass
+    
+    def schema_in(appstruct, schema, **kw):
+        pass
+
+
+
+
+class ITransformation(Interface):
+    """ """
+
+    name = Attribute("Name of this transformation")
+
+    def __call__(appstruct, fieldname, **kw):
+        pass
+
+
 class IObjectUpdatedEvent(Interface):
     """ Event sent when fields have been updated. """
     object = Attribute("The object this event is for.")
@@ -25,13 +46,13 @@ class IObjectUpdatedEvent(Interface):
                        "Should be a list with regular strings that correspond to field keys.")
     
     def __init__(object, fields=(),):
-        """ Init event. Usuallu done like this: 
+        """ Init event. Usually done like this:
             >>> from zope.component.event import objectEventNotify
             >>> context = SomeClass()
             >>> event = ObjectUpdatedEvent(context, fields=('updated', 'fields')
             >>> objectEventNotify(event)
         """
-    
+
 
 class IBaseFolder(IFolder):
     """ Base content type for all regular persistent models."""
