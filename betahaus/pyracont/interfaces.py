@@ -51,8 +51,16 @@ class ITransformation(Interface):
 
     name = Attribute("Name of this transformation")
 
-    def __call__(appstruct, node_name, **kw):
-        """ Preform transformation """
+    def appstruct(appstruct, node_name, **kw):
+        """ Preform transformation on a specific node name of an appstruct.
+            May affect other data within the appstruct.
+            NOTE: appsruct will be modified rather than returned.
+        """
+
+    def simple(value, **kw):
+        """ Transform a value. Normally just a string or similar.
+            NOTE: Will return the transformed value!
+        """
 
 
 class IObjectUpdatedEvent(Interface):

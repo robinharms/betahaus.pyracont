@@ -18,27 +18,29 @@ TAG_PATTERN = re.compile(r'(\A|\s|[,.;:!?])#(?P<tag>\w*[\w-]+)(\w*)', flags=re.U
 class HashtagLink(Transformation):
     name = 'hashtag_link'
     
-    def __call__(self, appstruct, node_name, **kw):
-        from webhelpers.html import HTML
+    def appstruct(self, appstruct, node_name, **kw):
         if node_name not in appstruct:
             return #nothing to do
+        appstruct[node_name] = self.simple(appstruct[node_name], **kw)
 
+    def simple(self, value, **kw):
+        from webhelpers.html import HTML
         request = kw['request']
 
         def handle_match(matchobj):
             pre, tag, post = matchobj.group(1, 2, 3)
             link = {'href': request.resource_url(request.context, '', query={'tag': tag}).replace(request.application_url, ''),
                     'class': "tag",}
-            
             return pre + HTML.a('#%s' % tag, **link) + post
     
-        appstruct[node_name] = re.sub(TAG_PATTERN, handle_match, appstruct[node_name])
+        return re.sub(TAG_PATTERN, handle_match, value)
+
 
 @transformator()
 class HashtagToTag(Transformation):
     name = 'hashtags_as_tags'
     
-    def __call__(self, appstruct, node_name, **kw):
+    def appstruct(self, appstruct, node_name, **kw):
         from webhelpers.html import HTML
         if node_name not in appstruct:
             return #nothing to do
@@ -50,5 +52,7 @@ class HashtagToTag(Transformation):
             if tag not in appstruct['tags']:
                 appstruct['tags'].append({'title': tag})
 
+    def simple(self, value, **kw):
+        raise NotImplementedError('Not possible to run simple on this transformation.')
             
         

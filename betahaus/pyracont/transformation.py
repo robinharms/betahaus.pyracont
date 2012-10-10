@@ -20,7 +20,7 @@ class TransformUtil(object):
     def transform_node(self, appstruct, node_name, chain, **kw):
         for tname in chain:
             transformation = getUtility(ITransformation, name = tname)
-            transformation(appstruct, node_name, **kw)
+            transformation.appstruct(appstruct, node_name, **kw)
 
     def apply_transformations(self, appstruct, schema, attr, **kw):
         for node in schema.children:
@@ -54,7 +54,10 @@ class Transformation(object):
     implements(ITransformation)
     name = None
 
-    def __call__(self, appstruct, node_name, **kw): #pragma : no cover
+    def appstruct(self, appstruct, node_name, **kw): #pragma : no cover
+        raise NotImplementedError("Must be implemented by subclass")
+
+    def simple(self, value, **kw): #pragma : no cover
         raise NotImplementedError("Must be implemented by subclass")
 
 
