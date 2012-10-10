@@ -19,30 +19,40 @@ class IFieldFactory(IFactory):
 
 
 class ITransformUtil(Interface):
-    """ """
+    """ Utility that handles execution of transformations. It doesn't do the transformations itself,
+        it calls registered ITransformation utils to do the processing.
+    """
 
     def output(appstruct, schema, **kw):
-        pass
+        """ Transform input. Will look for transformation attribute name 'transform_out'.
+        """
     
     def input(appstruct, schema, **kw):
-        pass
+        """ Transform input. Will look for transformation attribute name 'transform_in'.
+        """
 
     def transform_node(appstruct, node_name, chain, **kw):
-        pass
+        """ Apply a transformation chain to an appstruct.
+        """
+
     def apply_transformations(appstruct, schema, attr, **kw):
-        pass
+        """ Apply registered transformation chain to this appstruct.
+            Attr is the attribute to look for in the schema. Normally
+            this method is simply called from output or input.
+        """
 
     def get_chain(chain_name):
-        """ Get a list of the transformation tools to use. """
+        """ Get a list of the transformation tools to use for specific chain.
+        """
 
 
 class ITransformation(Interface):
-    """ """
+    """ Base class for transformations. They're named utils that will be called by the TransformUtil. """
 
     name = Attribute("Name of this transformation")
 
-    def __call__(appstruct, fieldname, **kw):
-        pass
+    def __call__(appstruct, node_name, **kw):
+        """ Preform transformation """
 
 
 class IObjectUpdatedEvent(Interface):

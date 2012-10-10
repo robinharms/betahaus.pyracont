@@ -1,6 +1,7 @@
 import venusian
 from zope.component.factory import Factory
 from zope.component import getUtility
+from zope.interface.verify import verifyClass
 
 from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.interfaces import IFieldFactory
@@ -56,11 +57,9 @@ class transformator(object):
     #FIXME: Preform check on registered transformation class
     venusian = venusian
 
-    def __init__(self, transformation_name):
-        self.transformation_name = transformation_name
-
     def register(self, scanner, name, wrapped):
-        scanner.config.registry.registerUtility(wrapped(), name = self.transformation_name)
+        verifyClass(ITransformation, wrapped)
+        scanner.config.registry.registerUtility(wrapped(), name = wrapped.name)
 
     def __call__(self, wrapped):
         self.venusian.attach(wrapped, self.register, category='pyracont')

@@ -2,8 +2,10 @@ from unittest import TestCase
 
 import colander
 from pyramid import testing
+from zope.interface.exceptions import DoesNotImplement
 
 from betahaus.pyracont.interfaces import ISchemaFactory
+from betahaus.pyracont.interfaces import ITransformation
 from betahaus.pyracont.tests.fixtures.contents import DummyContent
 from betahaus.pyracont.tests.fixtures.override_content import OtherContent
 from betahaus.pyracont.tests.fixtures.schemas import DummySchema
@@ -82,3 +84,23 @@ class DecoratorFieldFactoryTests(TestCase):
         obj = self._create_field('VersioningField')
         from betahaus.pyracont.interfaces import IBaseField
         self.failUnless(IBaseField.providedBy(obj))
+
+
+class DecoratorFieldFactoryTests(TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _get_trans(self, name):
+        return self.config.registry.getUtility(ITransformation, name)
+
+    def test_registered_integration(self):
+        self.config.scan('betahaus.pyracont.tests.fixtures.transform_decorated')
+        cls = self._get_trans('dummy')
+        self.failUnless(ITransformation.providedBy(cls))
+
+    def test_bad_class_picked_up(self):
+        self.assertRaises(DoesNotImplement, self.config.scan, 'betahaus.pyracont.tests.fixtures.transform_broken')
+

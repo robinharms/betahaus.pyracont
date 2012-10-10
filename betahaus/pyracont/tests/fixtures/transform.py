@@ -15,3 +15,4 @@ class _FakeTransformation(Transformation):
 def includeme(config):
     config.registry.registerUtility(_DummyTransformation(), name = 'dummy')
     config.registry.registerUtility(_FakeTransformation(), name = 'fake')
+

@@ -8,7 +8,7 @@ from betahaus.pyracont.interfaces import ITransformation
 
 
 class TransformUtil(object):
-    """ """
+    """ See .interfaces.ITransformUtil """
     implements(ITransformUtil)
 
     def output(self, appstruct, schema, **kw):
@@ -23,75 +23,24 @@ class TransformUtil(object):
             transformation(appstruct, node_name, **kw)
 
     def apply_transformations(self, appstruct, schema, attr, **kw):
-#        if hasattr(schema, attr):
-#            chain_name = getattr(schema, attr)
-#            chain = self.get_chain(chain_name)
-#            self.transform_node(appstruct, schema.name, chain, **kw)
-
-        print "\n\nstarting apply for node %s" % schema
-        print "appstruct"
-        print '---'
-
         for node in schema.children:
-            print "processing node %s" % node
-            #Sequence objects should be recursed into
+            #Sequence objects should be recursed into.
+            #In that case appstruct will be a list or a similar iterable
             if isinstance(node.typ, colander.Sequence):
-                print 'sequence'
                 for sub_app in appstruct.get(node.name, ()):
                     self.apply_transformations(sub_app, node, attr, **kw)
                 continue
-            else:
-                print "mapping"
+            #Transform this node
             if hasattr(node, attr):
-                print 'will apply for %s' % node
                 chain_name = getattr(node, attr)
                 chain = self.get_chain(chain_name)
                 self.transform_node(appstruct, node.name, chain, **kw)
-                print "Transforming node"
-            else:
-                print "No attrs set for this node"
-            print "Recursing"
+            #If current node is a mapping node, we should recurse into it.
             if isinstance(node.typ, colander.Mapping):
-                print "Instance is mapping, will recurse regardless of appstruct"
                 self.apply_transformations(appstruct, node, attr, **kw)
+            
             if node.name in appstruct:
-                print "node name in appstruct, recursing"
                 self.apply_transformations(appstruct[node.name], node, attr, **kw)
-            else:
-                print "node name NOT in appstruct, won't recurse"
-                
-
-                
-#            if hasattr(node, attr):
-#                print 'will apply for %s' % node
-#                chain_name = getattr(node, attr)
-#                chain = self.get_chain(chain_name)
-#                self.transform_node(appstruct, node.name, chain, **kw)
-#            else:
-#                print 'skipping apply for %s' % node
-#            if node.name in appstruct:
-#                print 'recursing into %s' % node
-#                self.apply_transformations(appstruct[node.name], node, attr, **kw)
-#            else:
-#                print 'checking children instead of recursing for %s' % node
-#                for snode in node.children:
-#                    if hasattr(snode, attr):
-#                        print 'child %s of %s will be applied - with subsection loop' % (snode, node)
-#                        chain_name = getattr(snode, attr)
-#                        chain = self.get_chain(chain_name)
-#                        #try:
-#                        for subsection in appstruct:
-#                            self.transform_node(subsection, snode.name, chain, **kw)
-#                        #except:
-#                        #    import pdb;pdb.set_trace()
-#                    else:
-#                        print 'skipping apply for child %s of %s' % (snode, node)
-#                    if snode.name in appstruct:
-#                        print 'recursing into child %s of node %s - with subsection loop' % (snode, node)
-#                        for subsection in appstruct:
-#                            self.apply_transformations(subsection[snode.name], snode, attr, **kw)
-#                    else:
-#                        print 'Will not recurse into child %s of node %s' % (snode, node)
 
     def get_chain(self, chain_name):
         settings = getUtility(ISettings)
@@ -99,11 +48,13 @@ class TransformUtil(object):
 
 
 class Transformation(object):
-    """ Base class for transformations. They're named utils that will be called by the TransformUtil. """
+    """ See .interfaces.ITransformation
+        You can inherit this baseclass to implement the interface.
+    """
     implements(ITransformation)
     name = None
 
-    def __call__(self, appstruct, node_name, **kw):
+    def __call__(self, appstruct, node_name, **kw): #pragma : no cover
         raise NotImplementedError("Must be implemented by subclass")
 
 

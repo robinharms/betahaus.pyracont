@@ -14,8 +14,9 @@ class Content(BaseFolder):
 TAG_PATTERN = re.compile(r'(\A|\s|[,.;:!?])#(?P<tag>\w*[\w-]+)(\w*)', flags=re.UNICODE)
 
 
-@transformator('hashtag_link')
+@transformator()
 class HashtagLink(Transformation):
+    name = 'hashtag_link'
     
     def __call__(self, appstruct, node_name, **kw):
         from webhelpers.html import HTML
@@ -33,8 +34,9 @@ class HashtagLink(Transformation):
     
         appstruct[node_name] = re.sub(TAG_PATTERN, handle_match, appstruct[node_name])
 
-@transformator('hashtags_as_tags')
+@transformator()
 class HashtagToTag(Transformation):
+    name = 'hashtags_as_tags'
     
     def __call__(self, appstruct, node_name, **kw):
         from webhelpers.html import HTML
