@@ -31,8 +31,14 @@ class ITransformUtil(Interface):
         """ Transform input. Will look for transformation attribute name 'transform_in'.
         """
 
-    def transform_node(appstruct, node_name, chain, **kw):
+    def transform_node(appstruct, node_name, chain_name, **kw):
         """ Apply a transformation chain to an appstruct.
+            Will run the method 'appstruct' from each ITransformation
+        """
+
+    def transform_value(value, chain_name, **kw):
+        """ Apply a chain on a specific value and return the result.
+            Will run the method 'simple' from each ITransformation.
         """
 
     def apply_transformations(appstruct, schema, attr, **kw):

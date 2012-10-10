@@ -38,17 +38,25 @@ class TransformUtilTests(TestCase):
         self._fixture()
         util = self._cut()
         appstruct = {}
-        chain = ['dummy']
-        util.transform_node(appstruct, 'dummy_schema_node', chain, hello = 'world')
+        self.config.registry.settings['transform.dummychain'] = 'dummy'
+        util.transform_node(appstruct, 'dummy_schema_node', 'dummychain', hello = 'world')
         self.assertEqual(appstruct['hello'], 'world')
 
     def test_transform_node_w_chain(self):
         self._fixture()
         util = self._cut()
         appstruct = {}
-        chain = ['dummy', 'fake']
-        util.transform_node(appstruct, 'dummy_schema_node', chain, dummy_schema_node = 'world')
+        self.config.registry.settings['transform.dummychain'] = 'dummy\nfake'
+        util.transform_node(appstruct, 'dummy_schema_node', 'dummychain', dummy_schema_node = 'world')
         self.assertEqual(appstruct['dummy_schema_node'], 'fake')
+
+    def test_transform_value_w_chain(self):
+        self._fixture()
+        util = self._cut()
+        self.config.registry.settings['transform.dummychain'] = 'dummy\nfake'
+        value = "I'm going to change"
+        result = util.transform_value(value, 'dummychain')
+        self.assertEqual(result, 'fake')
 
     def test_apply_transformations_simple(self):
         self._fixture()

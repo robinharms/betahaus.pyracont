@@ -7,7 +7,7 @@ class _DummyTransformation(Transformation):
         appstruct.update(**kw)
 
     def simple(self, value, **kw):
-        return kw['value']
+        return "*%s*" % value
 
 
 class _FakeTransformation(Transformation):
