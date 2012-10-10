@@ -1,4 +1,9 @@
 
+0.1dev -(unreleased)
+--------------------
+- New util for text transformation. Will make it a lot easier to scrub html,
+  replace newline with <br/> or similar. [robinharms]
+
 0.1a4 - 2012-09-05
 ------------------
 
