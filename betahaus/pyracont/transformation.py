@@ -18,6 +18,8 @@ class TransformUtil(object):
         return self.apply_transformations(appstruct, schema, 'transform_in', **kw)
 
     def transform_node(self, appstruct, node_name, chain_name, **kw):
+        if node_name not in appstruct:
+            raise KeyError("node_name '%s' doesn't exist in appstruct.")
         chain = self.get_chain(chain_name)
         for tname in chain:
             transformation = getUtility(ITransformation, name = tname)

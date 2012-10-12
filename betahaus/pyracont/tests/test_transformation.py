@@ -37,7 +37,7 @@ class TransformUtilTests(TestCase):
     def test_transform_node(self):
         self._fixture()
         util = self._cut()
-        appstruct = {}
+        appstruct = {'dummy_schema_node': 1}
         self.config.registry.settings['transform.dummychain'] = 'dummy'
         util.transform_node(appstruct, 'dummy_schema_node', 'dummychain', hello = 'world')
         self.assertEqual(appstruct['hello'], 'world')
@@ -45,10 +45,17 @@ class TransformUtilTests(TestCase):
     def test_transform_node_w_chain(self):
         self._fixture()
         util = self._cut()
-        appstruct = {}
+        appstruct = {'dummy_schema_node': 1}
         self.config.registry.settings['transform.dummychain'] = 'dummy\nfake'
         util.transform_node(appstruct, 'dummy_schema_node', 'dummychain', dummy_schema_node = 'world')
         self.assertEqual(appstruct['dummy_schema_node'], 'fake')
+
+    def test_transform_node_bad_node_name(self):
+        self._fixture()
+        util = self._cut()
+        appstruct = {}
+        self.config.registry.settings['transform.dummychain'] = 'dummy\nfake'
+        self.assertRaises(KeyError, util.transform_node, appstruct, 'i_dont_exist', 'dummychain', dummy_schema_node = 'world')
 
     def test_transform_value_w_chain(self):
         self._fixture()
@@ -61,7 +68,7 @@ class TransformUtilTests(TestCase):
     def test_apply_transformations_simple(self):
         self._fixture()
         util = self._cut()
-        appstruct = {}
+        appstruct = {'dummy_schema_node': 1}
         schema = createSchema('DummySchema')
         util.apply_transformations(appstruct, schema, 'transform_out')
         self.assertEqual(appstruct['dummy_schema_node'], 'fake')

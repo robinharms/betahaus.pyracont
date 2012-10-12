@@ -19,8 +19,6 @@ class HashtagLink(Transformation):
     name = 'hashtag_link'
     
     def appstruct(self, appstruct, node_name, **kw):
-        if node_name not in appstruct:
-            return #nothing to do
         appstruct[node_name] = self.simple(appstruct[node_name], **kw)
 
     def simple(self, value, **kw):
@@ -42,8 +40,6 @@ class HashtagToTag(Transformation):
     
     def appstruct(self, appstruct, node_name, **kw):
         from webhelpers.html import HTML
-        if node_name not in appstruct:
-            return #nothing to do
 
         request = kw['request']
 
