@@ -41,6 +41,5 @@ setup(name='betahaus.pyracont',
       [paste.app_factory]
       main = betahaus.pyracont.demoapp:main
       """,
-      paster_plugins=['pyramid'],
       )
 
