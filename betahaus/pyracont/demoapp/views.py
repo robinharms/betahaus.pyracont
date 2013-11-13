@@ -1,6 +1,10 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
-import deform
+try:
+    import deform
+except ImportError:
+    pass
+    #FIXME: Create a separate dummy package to avoid import errors
 
 from betahaus.pyracont.factories import createSchema
 from betahaus.pyracont.interfaces import ITransformUtil

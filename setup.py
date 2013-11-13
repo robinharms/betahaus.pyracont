@@ -38,8 +38,6 @@ setup(name='betahaus.pyracont',
       tests_require=requires,
       test_suite="betahaus.pyracont",
       entry_points = """\
-      [paste.app_factory]
-      main = betahaus.pyracont.demoapp:main
       """,
       )
 
