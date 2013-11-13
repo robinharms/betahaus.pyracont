@@ -1,11 +1,10 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 from betahaus.pyracont.interfaces import IObjectUpdatedEvent
 
-
+@implementer(IObjectUpdatedEvent)
 class ObjectUpdatedEvent(object):
-    __doc__ = IObjectUpdatedEvent.__doc__
-    implements(IObjectUpdatedEvent)
+    """ See interfaces.ObjectUpdatedEvent """
     
     def __init__(self, object, fields=(), ):
         self.object = object

@@ -1,11 +1,11 @@
 from persistent import Persistent
-from zope.interface import implements
+from zope.interface import implementer
 
 from betahaus.pyracont.interfaces import IBaseField
 
 
+@implementer(IBaseField)
 class BaseField(Persistent):
-    implements(IBaseField)
     
     def __init__(self, key=None, **kwargs):
         self.key = key
