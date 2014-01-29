@@ -3,7 +3,7 @@ from datetime import datetime
 from BTrees.LOBTree import LOBTree
 from pyramid.threadlocal import get_current_request
 from pyramid.security import authenticated_userid
-from zope.interface import implements
+from zope.interface import implementer
 
 from betahaus.pyracont.fields.base import BaseField
 from betahaus.pyracont.interfaces import IVersioningField
@@ -12,9 +12,9 @@ from betahaus.pyracont import utcnow
 
 
 @field_factory('VersioningField')
+@implementer(IVersioningField)
 class VersioningField(BaseField):
     """ Field that has versioning rather than just storing one value. """
-    implements(IVersioningField)
 
     def __init__(self, key=None, **kwargs):
         super(VersioningField, self).__init__(key=key, **kwargs)

@@ -1,6 +1,9 @@
 betahaus.pyracont
 =================
 
+.. image:: https://travis-ci.org/robinharms/betahaus.pyracont.png?branch=master
+  :target: https://travis-ci.org/robinharms/betahaus.pyracont
+
 Basic ZODB-based content type skeleton for Pyramid.
 
 Essentially, we noticed that most projects we did ended up having the same

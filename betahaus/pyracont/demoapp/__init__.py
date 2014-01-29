@@ -1,14 +1,13 @@
-from pyramid.config import Configurator
-from pyramid_zodbconn import get_connection
-
-
 
 def main(global_config, **settings):
     """ This is a simple demo app to demonstrate how both the transformation tool works
         and how content types can be constructed.
     """
+    from pyramid.config import Configurator
+    from pyramid_zodbconn import get_connection
+
     config = Configurator(root_factory=root_factory, settings=settings)
-    config.scan('betahaus.pyracont.demoapp')
+    #config.scan('betahaus.pyracont.demoapp')
     config.include('betahaus.pyracont.transformation')
     config.add_static_view('deform', 'deform:static')
     config.hook_zca()

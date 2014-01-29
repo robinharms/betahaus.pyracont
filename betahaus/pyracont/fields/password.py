@@ -1,6 +1,6 @@
 from hashlib import sha1
 
-from zope.interface import implements
+from zope.interface import implementer
 from betahaus.pyracont.fields.base import BaseField
 from betahaus.pyracont.interfaces import IPasswordField
 from betahaus.pyracont.decorators import field_factory
@@ -18,9 +18,9 @@ _marker = object()
 
 
 @field_factory('PasswordField')
+@implementer(IPasswordField)
 class PasswordField(BaseField):
     """ Field that stores hash of passed value. """
-    implements(IPasswordField)
 
     def __init__(self, key=None, hash_method=None, **kwargs):
         super(PasswordField, self).__init__(key=key, **kwargs)

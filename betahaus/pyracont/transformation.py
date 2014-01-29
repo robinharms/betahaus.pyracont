@@ -1,15 +1,15 @@
 import colander
 from pyramid.interfaces import ISettings
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import getUtility
 
 from betahaus.pyracont.interfaces import ITransformUtil
 from betahaus.pyracont.interfaces import ITransformation
 
 
+@implementer(ITransformUtil)
 class TransformUtil(object):
     """ See .interfaces.ITransformUtil """
-    implements(ITransformUtil)
 
     def output(self, appstruct, schema, **kw):
         return self.apply_transformations(appstruct, schema, 'transform_out', **kw)
@@ -56,11 +56,11 @@ class TransformUtil(object):
         return settings['transform.%s' % chain_name].strip().splitlines()
 
 
+@implementer(ITransformation)
 class Transformation(object):
     """ See .interfaces.ITransformation
         You can inherit this baseclass to implement the interface.
     """
-    implements(ITransformation)
     name = None
 
     def appstruct(self, appstruct, node_name, **kw): #pragma : no cover

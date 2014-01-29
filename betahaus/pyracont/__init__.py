@@ -5,7 +5,7 @@ import inspect
 import pytz
 from slugify import slugify
 from zope.component.event import objectEventNotify
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import providedBy
 from repoze.folder import Folder
 from repoze.folder import unicodify
@@ -21,9 +21,9 @@ from betahaus.pyracont.exceptions import CustomFunctionLoopError
 from betahaus.pyracont.transformation import Transformation #API
 
 
+@implementer(IBaseFolder)
 class BaseFolder(Folder):
     """ Base class for most content. """
-    implements(IBaseFolder)
     schemas = {}
     content_type = 'BaseFolder'
     allowed_contexts = ()
