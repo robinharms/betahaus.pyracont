@@ -1,6 +1,11 @@
 import colander
+from zope.interface import Interface
 
 from betahaus.pyracont.decorators import schema_factory
+
+
+class IDummySchema(Interface):
+    pass
 
 
 @schema_factory('DummySchema', title=u"dummy schema title", description=u"dummy schema description")

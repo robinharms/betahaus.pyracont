@@ -1,8 +1,10 @@
 from zope.component import getUtility
+from zope.component.event import objectEventNotify
 
 from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.interfaces import IFieldFactory
 from betahaus.pyracont.interfaces import ISchemaFactory
+from betahaus.pyracont.events import SchemaCreatedEvent
 
 
 def createContent(factory_name, *args, **kwargs):
@@ -16,8 +18,7 @@ def createSchema(factory_name, **kwargs):
     """
     factory = getUtility(ISchemaFactory, factory_name)
     schema = factory(**kwargs)
-    schema.title = factory.title
-    schema.description = factory.description
+    objectEventNotify(SchemaCreatedEvent(schema))
     return schema
 
 

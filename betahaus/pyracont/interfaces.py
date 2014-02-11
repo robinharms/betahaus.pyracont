@@ -33,6 +33,14 @@ class IObjectUpdatedEvent(Interface):
         """
 
 
+class ISchemaCreatedEvent(Interface):
+    pass
+
+
+class ISchemaBoundEvent(Interface):
+    pass
+
+
 class IBaseFolder(IFolder):
     """ Base content type for all regular persistent models."""
     title = Attribute("Title")

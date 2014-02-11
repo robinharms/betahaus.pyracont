@@ -9,7 +9,10 @@ from zope.component.factory import Factory
 from betahaus.pyracont.interfaces import ISchemaFactory
 from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.interfaces import IFieldFactory
+from betahaus.pyracont.interfaces import ISchemaCreatedEvent
+from betahaus.pyracont.interfaces import ISchemaBoundEvent
 from betahaus.pyracont.tests.fixtures.schemas import DummySchema
+from betahaus.pyracont.tests.fixtures.schemas import IDummySchema
 
 
 class CreateContentTests(TestCase):
@@ -42,15 +45,16 @@ class CreateContentTests(TestCase):
 class CreateSchemaTests(TestCase):
     def setUp(self):
         self.config = testing.setUp()
-        self._register_factory()
         
     def tearDown(self):
         testing.tearDown()
 
-    def _register_factory(self):
-        factory = Factory(DummySchema, 'DummySchema')
-        factory.title = u"dummy schema title"
-        factory.description = u"dummy schema description"
+    def _register_factory(self, **kw):
+        from betahaus.pyracont.models import SchemaFactory
+        params = dict(title = u"dummy schema title",
+                      description = u"dummy schema description")
+        params.update(kw)
+        factory = SchemaFactory(DummySchema, **params)
         self.config.registry.registerUtility(factory, ISchemaFactory, 'DummySchema')
 
     @property
@@ -63,26 +67,44 @@ class CreateSchemaTests(TestCase):
 
     def test_create_object(self):
         """ Should return the same as createSchema. """
+        self._register_factory()
         obj = createObject('DummySchema')
         #Note: Instantiated schemas are SchemaNodes themselves!
         self.failUnless(isinstance(obj, colander.SchemaNode))
 
     def test_create_schema(self):
+        self._register_factory()
         obj = self._fut('DummySchema')
         #Note: Instantiated schemas are SchemaNodes themselves!
         self.failUnless(isinstance(obj, colander.SchemaNode))
 
     def test_title_from_factory(self):
+        self._register_factory()
         factory = self._get_factory()
         obj = self._fut('DummySchema')
         self.assertEqual("dummy schema title", obj.title)
         self.assertEqual(factory.title, obj.title)
 
     def test_description_from_factory(self):
+        self._register_factory()
         factory = self._get_factory()
         obj = self._fut('DummySchema')
         self.assertEqual("dummy schema description", obj.description)
         self.assertEqual(factory.description, obj.description)
+
+    def test_provides_declaration_passed_along_to_instance(self):
+        self._register_factory(provides = IDummySchema)
+        obj = self._fut('DummySchema')
+        self.failUnless(IDummySchema.providedBy(obj))
+
+    def test_event_sent(self):
+        self._register_factory(provides = IDummySchema)
+        L = []
+        def subscriber(obj, event):
+            L.append(event)
+        self.config.add_subscriber(subscriber, (IDummySchema, ISchemaCreatedEvent,))
+        obj = self._fut('DummySchema')
+        self.failUnless(ISchemaCreatedEvent.providedBy(L[0]))
 
 
 class CreateFieldTests(TestCase):
