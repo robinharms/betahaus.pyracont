@@ -4,7 +4,7 @@ from zope.component.factory import Factory
 from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.interfaces import IFieldFactory
 from betahaus.pyracont.interfaces import ISchemaFactory
-from betahaus.pyracont.models import SchemaFactory
+from betahaus.pyracont.factories import SchemaFactory
 
 
 

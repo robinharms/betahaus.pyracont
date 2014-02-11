@@ -49,7 +49,7 @@ class CreateSchemaTests(TestCase):
         testing.tearDown()
 
     def _register_factory(self, **kw):
-        from betahaus.pyracont.models import SchemaFactory
+        from betahaus.pyracont.factories import SchemaFactory
         params = dict(title = u"dummy schema title",
                       description = u"dummy schema description")
         params.update(kw)

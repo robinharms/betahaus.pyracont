@@ -1,6 +1,7 @@
 from zope.component.interfaces import IFactory
 from zope.interface import Attribute
 from zope.interface import Interface
+from zope.interface.interfaces import IObjectEvent
 from repoze.folder.interfaces import IFolder
 
 
@@ -18,7 +19,7 @@ class IFieldFactory(IFactory):
     """ Factory for fields. Works the same way as IFactory. """
 
 
-class IObjectUpdatedEvent(Interface):
+class IObjectUpdatedEvent(IObjectEvent):
     """ Event sent when fields have been updated. """
     object = Attribute("The object this event is for.")
     fields = Attribute("Fields that have been updated."
@@ -33,12 +34,12 @@ class IObjectUpdatedEvent(Interface):
         """
 
 
-class ISchemaCreatedEvent(Interface):
-    """ """
+class ISchemaCreatedEvent(IObjectEvent):
+    """ Fires when a schema object has been created."""
     object = Attribute("The object this event is for - always an instantiated schema")
 
 
-class ISchemaBoundEvent(Interface):
+class ISchemaBoundEvent(IObjectEvent):
     """ """
     object = Attribute("The object this event is for - always an instantiated schema")
     kw = Attribute("A dict of the key/values that was used in schema.bind()")
