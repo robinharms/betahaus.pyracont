@@ -1,7 +1,5 @@
 import venusian
 from zope.component.factory import Factory
-from zope.component import getUtility
-from zope.interface.verify import verifyClass
 
 from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.interfaces import IFieldFactory
@@ -15,7 +13,7 @@ class content_factory(object):
     """ Decorator for factories for regular content types """
     venusian = venusian
     
-    def __init__(self, factory_name, title=u'', description=u'', interfaces=None, provides = None):
+    def __init__(self, factory_name = None, title = u'', description = u'', interfaces = None, provides = None):
         self.factory_name = factory_name
         self.title = title
         self.description = description
@@ -28,7 +26,8 @@ class content_factory(object):
                           title=title,
                           description=self.description,
                           interfaces=self.interfaces)
-        scanner.config.registry.registerUtility(factory, IContentFactory, self.factory_name)
+        name = self.factory_name and self.factory_name or name
+        scanner.config.registry.registerUtility(factory, IContentFactory, name = name)
 
     def __call__(self, wrapped):
         self.venusian.attach(wrapped, self.register, category='pyracont')
@@ -43,7 +42,8 @@ class schema_factory(content_factory):
                           description=self.description,
                           interfaces=self.interfaces,
                           provides=self.provides)
-        scanner.config.registry.registerUtility(factory, ISchemaFactory, self.factory_name)
+        name = self.factory_name and self.factory_name or name
+        scanner.config.registry.registerUtility(factory, ISchemaFactory, name = name)
 
 
 class field_factory(content_factory):
@@ -53,5 +53,6 @@ class field_factory(content_factory):
                           title=self.title,
                           description=self.description,
                           interfaces=self.interfaces)
-        scanner.config.registry.registerUtility(factory, IFieldFactory, self.factory_name)
+        name = self.factory_name and self.factory_name or name
+        scanner.config.registry.registerUtility(factory, IFieldFactory, name = name)
 

@@ -1,14 +1,11 @@
 from unittest import TestCase
 
-import colander
 from pyramid import testing
-from zope.interface.exceptions import DoesNotImplement
 
 from betahaus.pyracont.interfaces import ISchemaFactory
+from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.tests.fixtures.contents import DummyContent
 from betahaus.pyracont.tests.fixtures.override_content import OtherContent
-from betahaus.pyracont.tests.fixtures.schemas import DummySchema
-from betahaus.pyracont.tests.fixtures.override_schema import OtherSchema
 
 
 class DecoratorContentFactoryTests(TestCase):
@@ -20,7 +17,6 @@ class DecoratorContentFactoryTests(TestCase):
         testing.tearDown()
     
     def _create_content(self, name):
-        from betahaus.pyracont.interfaces import IContentFactory
         return self.config.registry.getUtility(IContentFactory, name)()
 
     def test_content_registered(self):
@@ -31,6 +27,9 @@ class DecoratorContentFactoryTests(TestCase):
         self.config.scan('betahaus.pyracont.tests.fixtures.override_content')
         obj = self._create_content('DummyContent')
         self.failUnless(isinstance(obj, OtherContent))
+
+    def test_name_taken_from_class_if_not_specified(self):
+        self.failUnless(self.config.registry.queryUtility(IContentFactory, name = 'SomeInterestingContent'))
 
 
 class DecoratorSchemaFactoryTests(TestCase):

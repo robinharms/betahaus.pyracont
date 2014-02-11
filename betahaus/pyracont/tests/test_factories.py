@@ -2,7 +2,6 @@ from unittest import TestCase
 
 import colander
 from pyramid import testing
-from zope.interface.verify import verifyObject
 from zope.component import createObject
 from zope.component.factory import Factory
 

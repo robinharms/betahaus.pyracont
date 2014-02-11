@@ -5,7 +5,6 @@ import colander
 from pyramid import testing
 from zope.interface.verify import verifyObject
 from zope.interface.verify import verifyClass
-from zope.component.factory import Factory
 from zope.component.interfaces import ComponentLookupError
 from BTrees.OOBTree import OOBTree
 

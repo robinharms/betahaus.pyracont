@@ -7,3 +7,8 @@ class DummyContent(object):
     def __init__(self, *args, **kwargs):
         setattr(self, 'args', args)
         setattr(self, 'kwargs', kwargs)
+
+
+@content_factory()
+class SomeInterestingContent(object):
+    pass

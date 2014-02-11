@@ -13,9 +13,9 @@ def createContent(factory_name, *args, **kwargs):
     """
     return getUtility(IContentFactory, factory_name)(*args, **kwargs)
 
-
 def createSchema(factory_name, bind = None, **kwargs):
-    """ Create a colander schema object.
+    """ Create a colander schema object. When they're instantiated, they're changed
+        to colander.SchemaNode instances.
     """
     factory = getUtility(ISchemaFactory, factory_name)
     schema = factory(**kwargs)
@@ -24,7 +24,6 @@ def createSchema(factory_name, bind = None, **kwargs):
         schema = schema.bind(**bind)
         objectEventNotify(SchemaBoundEvent(schema, **bind))
     return schema
-
 
 def createField(factory_name, *args, **kwargs):
     """ Create a field object. """
