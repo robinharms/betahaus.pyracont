@@ -18,7 +18,6 @@ from betahaus.pyracont.interfaces import IBaseFolder
 from betahaus.pyracont.events import ObjectUpdatedEvent
 from betahaus.pyracont.factories import createField
 from betahaus.pyracont.exceptions import CustomFunctionLoopError
-from betahaus.pyracont.transformation import Transformation #API
 
 
 @implementer(IBaseFolder)

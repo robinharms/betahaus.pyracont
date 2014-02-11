@@ -18,57 +18,6 @@ class IFieldFactory(IFactory):
     """ Factory for fields. Works the same way as IFactory. """
 
 
-class ITransformUtil(Interface):
-    """ Utility that handles execution of transformations. It doesn't do the transformations itself,
-        it calls registered ITransformation utils to do the processing.
-    """
-
-    def output(appstruct, schema, **kw):
-        """ Transform input. Will look for transformation attribute name 'transform_out'.
-        """
-    
-    def input(appstruct, schema, **kw):
-        """ Transform input. Will look for transformation attribute name 'transform_in'.
-        """
-
-    def transform_node(appstruct, node_name, chain_name, **kw):
-        """ Apply a transformation chain to an appstruct.
-            Will run the method 'appstruct' from each ITransformation
-        """
-
-    def transform_value(value, chain_name, **kw):
-        """ Apply a chain on a specific value and return the result.
-            Will run the method 'simple' from each ITransformation.
-        """
-
-    def apply_transformations(appstruct, schema, attr, **kw):
-        """ Apply registered transformation chain to this appstruct.
-            Attr is the attribute to look for in the schema. Normally
-            this method is simply called from output or input.
-        """
-
-    def get_chain(chain_name):
-        """ Get a list of the transformation tools to use for specific chain.
-        """
-
-
-class ITransformation(Interface):
-    """ Base class for transformations. They're named utils that will be called by the TransformUtil. """
-
-    name = Attribute("Name of this transformation")
-
-    def appstruct(appstruct, node_name, **kw):
-        """ Preform transformation on a specific node name of an appstruct.
-            May affect other data within the appstruct.
-            NOTE: appsruct will be modified rather than returned.
-        """
-
-    def simple(value, **kw):
-        """ Transform a value. Normally just a string or similar.
-            NOTE: Will return the transformed value!
-        """
-
-
 class IObjectUpdatedEvent(Interface):
     """ Event sent when fields have been updated. """
     object = Attribute("The object this event is for.")
