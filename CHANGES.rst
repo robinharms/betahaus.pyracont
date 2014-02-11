@@ -1,9 +1,10 @@
 
-0.2b - (unreleased)
--------------------
+0.2b - 2014-02-11
+-----------------
+
 - Possibility to bind zope interfaces to schemas so objectevents will work as expected.
   This enables subscribers for schemas.
-- Factory names can now be omited - the class name is used in that case.
+- Factory names can now be omitted - the class name is used in that case.
 - Python 3 should work now.
 
 0.1a4 - 2012-09-05
