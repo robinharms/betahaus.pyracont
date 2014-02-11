@@ -5,6 +5,7 @@ from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.interfaces import IFieldFactory
 from betahaus.pyracont.interfaces import ISchemaFactory
 from betahaus.pyracont.events import SchemaCreatedEvent
+from betahaus.pyracont.events import SchemaBoundEvent
 
 
 def createContent(factory_name, *args, **kwargs):
@@ -13,12 +14,15 @@ def createContent(factory_name, *args, **kwargs):
     return getUtility(IContentFactory, factory_name)(*args, **kwargs)
 
 
-def createSchema(factory_name, **kwargs):
+def createSchema(factory_name, bind = None, **kwargs):
     """ Create a colander schema object.
     """
     factory = getUtility(ISchemaFactory, factory_name)
     schema = factory(**kwargs)
     objectEventNotify(SchemaCreatedEvent(schema))
+    if bind:
+        schema = schema.bind(**bind)
+        objectEventNotify(SchemaBoundEvent(schema, **bind))
     return schema
 
 

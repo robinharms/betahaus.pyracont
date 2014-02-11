@@ -97,7 +97,7 @@ class CreateSchemaTests(TestCase):
         obj = self._fut('DummySchema')
         self.failUnless(IDummySchema.providedBy(obj))
 
-    def test_event_sent(self):
+    def test_created_event_sent(self):
         self._register_factory(provides = IDummySchema)
         L = []
         def subscriber(obj, event):
@@ -105,6 +105,15 @@ class CreateSchemaTests(TestCase):
         self.config.add_subscriber(subscriber, (IDummySchema, ISchemaCreatedEvent,))
         obj = self._fut('DummySchema')
         self.failUnless(ISchemaCreatedEvent.providedBy(L[0]))
+
+    def test_bound_event_sent(self):
+        self._register_factory(provides = IDummySchema)
+        L = []
+        def subscriber(obj, event):
+            L.append(event)
+        self.config.add_subscriber(subscriber, (IDummySchema, ISchemaBoundEvent,))
+        obj = self._fut('DummySchema', bind = {'dummy': 1})
+        self.failUnless(ISchemaBoundEvent.providedBy(L[0]))
 
 
 class CreateFieldTests(TestCase):

@@ -24,5 +24,6 @@ class SchemaCreatedEvent(object):
 @implementer(ISchemaBoundEvent)
 class SchemaBoundEvent(object):
 
-    def __init__(self, object):
+    def __init__(self, object, **kw):
         self.object = object
+        self.kw = kw

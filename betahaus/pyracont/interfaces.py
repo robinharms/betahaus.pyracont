@@ -34,11 +34,14 @@ class IObjectUpdatedEvent(Interface):
 
 
 class ISchemaCreatedEvent(Interface):
-    pass
+    """ """
+    object = Attribute("The object this event is for - always an instantiated schema")
 
 
 class ISchemaBoundEvent(Interface):
-    pass
+    """ """
+    object = Attribute("The object this event is for - always an instantiated schema")
+    kw = Attribute("A dict of the key/values that was used in schema.bind()")
 
 
 class IBaseFolder(IFolder):
