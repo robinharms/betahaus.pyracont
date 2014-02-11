@@ -6,6 +6,7 @@ from betahaus.pyracont.interfaces import ISchemaFactory
 from betahaus.pyracont.interfaces import IContentFactory
 from betahaus.pyracont.tests.fixtures.contents import DummyContent
 from betahaus.pyracont.tests.fixtures.override_content import OtherContent
+from betahaus.pyracont.tests.fixtures.schemas import IDummySchema
 
 
 class DecoratorContentFactoryTests(TestCase):
@@ -64,6 +65,10 @@ class DecoratorSchemaFactoryTests(TestCase):
     def test_description_picked_up(self):
         obj = self._get_factory()
         self.assertEqual(obj.description, u"dummy schema description")
+
+    def test_provides_declaration_passed_along_to_instance(self):
+        obj = self._create_schema('DummySchema')
+        self.failUnless(IDummySchema.providedBy(obj))
 
 
 class DecoratorFieldFactoryTests(TestCase):

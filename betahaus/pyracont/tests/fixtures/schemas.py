@@ -8,7 +8,7 @@ class IDummySchema(Interface):
     pass
 
 
-@schema_factory('DummySchema', title=u"dummy schema title", description=u"dummy schema description")
+@schema_factory('DummySchema', title=u"dummy schema title", description=u"dummy schema description", provides = IDummySchema)
 class DummySchema(colander.Schema):
     dummy_schema_node = colander.SchemaNode(colander.String(),)
 
