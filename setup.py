@@ -12,6 +12,8 @@ requires = ('pyramid',
             'pytz',
             'ZODB3',
             'colander',
+            'zope.interface',
+            'zope.component',
             )
 
 setup(name='betahaus.pyracont',
@@ -20,12 +22,12 @@ setup(name='betahaus.pyracont',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
-        "Framework :: Pylons",
+        "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License (GPL)",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         ],
       author='Robin Harms Oredsson and contributors',
       author_email='robin@betahaus.net',
@@ -40,4 +42,3 @@ setup(name='betahaus.pyracont',
       entry_points = """\
       """,
       )
-
