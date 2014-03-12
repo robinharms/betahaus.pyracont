@@ -34,13 +34,13 @@ class PasswordField(BaseField):
         assert callable(hash_method)
         self.hash_method = hash_method
 
-    def get(self, default=None):
+    def get(self, default = None, **kwargs):
         pw = self.__encrypted_password__
         if pw is None:
             return default
         return pw
 
-    def set(self, value):
+    def set(self, value, **kwargs):
         if not isinstance(value, unicode):
             value = unicodify(value)
         if not len(value) >= self.min_length:
@@ -59,3 +59,7 @@ class PasswordField(BaseField):
 
     def clear_password(self):
         self.__encrypted_password__ = None
+
+
+def includeme(config):
+    config.scan(__name__)

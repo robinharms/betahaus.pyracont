@@ -4,6 +4,9 @@ from pyramid import testing
 from zope.interface.verify import verifyObject
 from zope.interface.verify import verifyClass
 
+from betahaus.pyracont.interfaces import IFieldFactory
+from betahaus.pyracont.interfaces import IVersioningField
+
 
 class VersioningFieldTests(TestCase):
     def setUp(self):
@@ -22,11 +25,9 @@ class VersioningFieldTests(TestCase):
         return utcnow()
 
     def test_verify_class(self):
-        from betahaus.pyracont.interfaces import IVersioningField
         self.failUnless(verifyClass(IVersioningField, self._cut))
 
     def test_verify_obj(self):
-        from betahaus.pyracont.interfaces import IVersioningField
         self.failUnless(verifyObject(IVersioningField, self._cut()))
 
     def test_get_current_rev_id(self):
@@ -115,3 +116,7 @@ class VersioningFieldTests(TestCase):
         expected[2] = {'value':'World', 'author': 'two', 'created': now}
         expected[3] = {'value':'!', 'author': 'three', 'created': now}
         self.assertEqual(res, expected)
+
+    def test_integration(self):
+        self.config.include('betahaus.pyracont.fields.versioning')
+        self.failUnless(self.config.registry.queryUtility(IFieldFactory, name = 'VersioningField'))

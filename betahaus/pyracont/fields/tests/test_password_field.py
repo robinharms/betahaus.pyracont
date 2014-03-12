@@ -4,6 +4,10 @@ from pyramid import testing
 from zope.interface.verify import verifyObject
 from zope.interface.verify import verifyClass
 
+from betahaus.pyracont.interfaces import IPasswordField
+from betahaus.pyracont.interfaces import IFieldFactory
+
+
 def _dummy_hash_method(text):
     """ Dummy method that appends '-1' to every string...
     """
@@ -23,11 +27,9 @@ class PasswordFieldTests(TestCase):
         return PasswordField
 
     def test_verify_class(self):
-        from betahaus.pyracont.interfaces import IPasswordField
         self.failUnless(verifyClass(IPasswordField, self._cut))
 
     def test_verify_obj(self):
-        from betahaus.pyracont.interfaces import IPasswordField
         self.failUnless(verifyObject(IPasswordField, self._cut()))
 
     def test_with_default_hash(self):
@@ -73,3 +75,7 @@ class PasswordFieldTests(TestCase):
     def test_check_input_no_pw_set(self):
         obj = self._cut()
         self.assertEqual(obj.check_input('pw'), False)
+
+    def test_integration(self):
+        self.config.include('betahaus.pyracont.fields.password')
+        self.failUnless(self.config.registry.queryUtility(IFieldFactory, name = 'PasswordField'))

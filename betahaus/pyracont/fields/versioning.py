@@ -34,14 +34,14 @@ class VersioningField(BaseField):
     def _revision_created_timestamps(self):
         return self.__revision_created_timestamps__
 
-    def get(self, default=None):
+    def get(self, default=None, **kwargs):
         """ Return value of last revision """
         if not len(self._revision_values):
             return default
         id = self.get_current_rev_id()
         return self._revision_values[id]
 
-    def set(self, value):
+    def set(self, value, **kwargs):
         self.add(value)
 
     def get_current_rev_id(self):
@@ -92,3 +92,7 @@ class VersioningField(BaseField):
 
     def __len__(self):
         return len(self._revision_values)
+
+
+def includeme(config):
+    config.scan(__name__)

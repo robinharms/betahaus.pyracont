@@ -75,7 +75,7 @@ class BaseFolder(Folder):
         """ Mark content as modified. """
         self.field_storage['modified'] = utcnow()
 
-    def get_field_value(self, key, default=None):
+    def get_field_value(self, key, default=None, **kwargs):
         """ Return field value, or default """        
         if key in self.custom_accessors:
             if inspect.stack()[2][3] == 'get_field_value':
@@ -83,13 +83,13 @@ class BaseFolder(Folder):
             accessor = self.custom_accessors[key]
             if isinstance(accessor, basestring):
                 accessor = getattr(self, accessor)
-            return accessor(default=default, key=key)
+            return accessor(default=default, key=key, **kwargs)
         if key in self.custom_fields:
             field = self.get_custom_field(key)
-            return field.get(default=default)
+            return field.get(default=default, **kwargs)
         return self.field_storage.get(key, default)
 
-    def set_field_value(self, key, value):
+    def set_field_value(self, key, value, **kwargs):
         """ Set field value.
             Will not send events, so use this if you silently want to change a single field.
             You can override field behaviour by either setting custom mutators
@@ -101,41 +101,41 @@ class BaseFolder(Folder):
             mutator = self.custom_mutators[key]
             if isinstance(mutator, basestring):
                 mutator = getattr(self, mutator)
-            mutator(value, key=key)
+            mutator(value, key=key, **kwargs)
             return
         if key in self.custom_fields:
             field = self.get_custom_field(key)
-            field.set(value)
+            field.set(value, **kwargs)
             return
         self.field_storage[key] = value
 
-    def get_field_appstruct(self, schema):
+    def get_field_appstruct(self, schema, **kwargs):
         """ Return a dict of all fields and their values.
             Deform expects input like this when rendering already saved values.
         """
         marker = object()
         appstruct = {}
         for field in schema:
-            value = self.get_field_value(field.name, marker)
+            value = self.get_field_value(field.name, default = marker, **kwargs)
             if value != marker:
                 appstruct[field.name] = value
         return appstruct
 
-    def set_field_appstruct(self, values, notify=True, mark_modified=True):
+    def set_field_appstruct(self, values, notify = True, mark_modified = True, **kwargs):
         """ Set values from a dict or similar key/value object.
             Only updates if the new value isn't the same as the old one.
             Returns set of keys (fieldnames) that have been updated.
         """
         updated = set()
         for (k, v) in values.items():
-            cur = self.get_field_value(k)
+            cur = self.get_field_value(k, **kwargs)
             if cur == v:
                 continue
-            self.set_field_value(k, v)
+            self.set_field_value(k, v, **kwargs)
             updated.add(k)
         if updated:
             if notify:
-                objectEventNotify(ObjectUpdatedEvent(self, fields=updated))
+                objectEventNotify(ObjectUpdatedEvent(self, fields = updated))
             if mark_modified and 'modified' not in values:
                 #Don't update if modified is set, since it will override the value we're trying to set.
                 self.mark_modified()
