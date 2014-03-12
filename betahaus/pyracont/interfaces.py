@@ -205,3 +205,24 @@ class IPasswordField(IBaseField):
     def clear_password():
         """ Removes stored password and set the field as None.
         """
+
+
+class ILangField(IBaseField):
+    """ Multilingual field that handles content in different languages. """
+    langs = Attribute("A set of all handled language codes. (Readonly)")
+    main_lang = Attribute("""The language code of this fields default language.
+        It doesn't have to be the same as the system default""")
+    translated = Attribute("Set of all other languages this field should or could translate to.")
+    fuzzy = Attribute("""If a language has a translation, it may be marked as fuzzy by user interaction
+        or when the string it was translated from is changed.""")
+
+    def get(default = None, langs = ()):
+        """ Returns a dict with the keys from langs. default will be set as value for each key that doesn't have a value. """
+
+    def set(value):
+        """ Set a dict of translations. If the main language is included and changed, all other languages that aren't included
+            will be marked as fuzzy.
+        """
+
+    def remove(key):
+        """ Remove a language from this field, if it exists. """
