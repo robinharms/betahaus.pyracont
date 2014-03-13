@@ -1,5 +1,5 @@
 
-0.2dev - (unreleased)
+0.3dev - (unreleased)
 ---------------------
 
 (nothing yet)
