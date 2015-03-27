@@ -10,7 +10,7 @@ from betahaus.pyracont.interfaces import IVersioningField
 
 class VersioningFieldTests(TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(request = testing.DummyRequest())
 
     def tearDown(self):
         testing.tearDown()

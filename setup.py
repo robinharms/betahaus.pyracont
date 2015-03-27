@@ -8,7 +8,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 requires = ('pyramid',
             'repoze.folder',
-            'slugify',
+            'awesome-slugify',
             'pytz',
             'ZODB3',
             'colander',
@@ -17,7 +17,7 @@ requires = ('pyramid',
             )
 
 setup(name='betahaus.pyracont',
-      version='0.3dev',
+      version='0.3b',
       description='betahaus.pyracont',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[

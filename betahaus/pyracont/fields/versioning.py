@@ -2,7 +2,6 @@ from datetime import datetime
 
 from BTrees.LOBTree import LOBTree
 from pyramid.threadlocal import get_current_request
-from pyramid.security import authenticated_userid
 from zope.interface import implementer
 
 from betahaus.pyracont.fields.base import BaseField
@@ -55,7 +54,7 @@ class VersioningField(BaseField):
         assert isinstance(created, datetime)
         if author is None:
             request = get_current_request()
-            author = authenticated_userid(request)
+            author = request.authenticated_userid
         #author might still be None, if this is run by a script or by an unauthenticated user
         id = self.get_current_rev_id()+1
         self._revision_values[id] = value

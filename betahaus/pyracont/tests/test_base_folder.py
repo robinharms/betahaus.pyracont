@@ -98,15 +98,6 @@ class BaseFolderTests(TestCase):
         obj = self._cut(title="a")
         self.assertEqual(obj.suggest_name(parent), 'a-3')
 
-    def test_suggest_name_full_namespace(self):
-        parent = {}
-        parent['a'] = object()
-        for i in range(101):
-            k = "a-%s" % i
-            parent[k] = object()
-        obj = self._cut(title='a')
-        self.assertRaises(KeyError, obj.suggest_name, parent)
-
     def test_mark_modified(self):
         obj = self._cut()
         modified = obj.modified

@@ -1,8 +1,9 @@
 
-0.3dev - (unreleased)
----------------------
+0.3b - 2015-03-27
+-----------------
 
-(nothing yet)
+- suggest_name method now handles non-ascii better. This changed
+  the dependencies from 'slugify' to 'awesome-slugify'.
 
 0.2b - 2014-02-11
 -----------------
@@ -19,7 +20,7 @@
   existing view. Before it was possible to name objects the same way as views. [robinharms]
 
 0.1a3 - 2012-02-14
--------------------
+------------------
 
 - Typo on code caused description to be stored under the wrong attribute of
   the schema when using createSchema. [robinharms]

@@ -3,7 +3,7 @@ from datetime import datetime
 import inspect
 
 import pytz
-from slugify import slugify
+from slugify import UniqueSlugify
 from zope.component.event import objectEventNotify
 from zope.interface import implementer
 from zope.interface import providedBy
@@ -173,28 +173,27 @@ def check_unique_name(context, request, name):
         return False
     return True
 
+def get_context_view_names(context, request):
+    provides = [IViewClassifier] + map(
+        providedBy,
+        (request, context)
+    )
+    return [x for (x, y) in request.registry.adapters.lookupAll(provides, IView)]
 
 def generate_slug(parent, text, limit=20):
     """ Suggest a name for content that will be added.
         text is a title or similar to be used.
     """
-    text = unicodify(text)
-    suggestion = slugify(text[:limit])
+    used_names = set(parent.keys())
+    request = get_current_request()
+    used_names.update(get_context_view_names(parent, request))
+    sluggo = UniqueSlugify(to_lower = True,
+                           stop_words = ['a', 'an', 'the'],
+                           max_length = 80,
+                           uids = used_names)
+    suggestion = sluggo(text)
     if not len(suggestion):
         raise ValueError("When text was made URL-friendly, nothing remained.")
-    request = get_current_request()
-
-    #Is the suggested ID already unique?
     if check_unique_name(parent, request, suggestion):
         return suggestion
-    
-    #ID isn't unique, let's try to generate a unique one.
-    RETRY = 100
-    i = 1
-    while i <= RETRY:
-        new_s = "%s-%s" % (suggestion, str(i))
-        if check_unique_name(parent, request, new_s):
-            return new_s
-        i += 1
-    #If no id was found, don't just continue
     raise KeyError("No unique id could be found")
